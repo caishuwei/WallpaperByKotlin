@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wallpaper xmlns:android="http://schemas.android.com/apk/res/android"
+    android:author="@string/author"
+    android:description="@string/description"
+    android:settingsActivity="com.example.caisw.wallpaperbykotlin.ui.preview.PreviewActivity"
+    android:thumbnail="@mipmap/ic_launcher" />

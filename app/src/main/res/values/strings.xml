@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WallpaperByKotlin</string>
+    <string name="description">wallpaper test</string>
+    <string name="author">caisw</string>
+</resources>
