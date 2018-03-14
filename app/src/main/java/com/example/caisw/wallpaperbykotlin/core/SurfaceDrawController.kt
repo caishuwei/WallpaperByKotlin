@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import com.example.caisw.wallpaperbykotlin.spirit.BaseSpirit
+import com.example.caisw.wallpaperbykotlin.spirit.Frame
 import java.lang.Exception
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -13,10 +14,15 @@ import java.util.concurrent.CopyOnWriteArrayList
  */
 class SurfaceDrawController : IDrawController {
 
+    companion object {
+        var DEBUG = true
+    }
+
     private var drawing: Boolean = false
     private var drawThread: SurfaceDrawController.DrawThread? = null
     val spiritHolder: SpiritHolder
     private val surfaceHolderProvider: SurfaceHolderProvider
+    private val frameDisplay = Frame()
 
     constructor(surfaceHolderProvider: SurfaceHolderProvider) {
         spiritHolder = SpiritHolder()
@@ -58,6 +64,9 @@ class SurfaceDrawController : IDrawController {
         val iterator = spiritHolder.spiritList.iterator()
         while (iterator.hasNext()) {
             iterator.next().drawMySelf(canvas)
+        }
+        if (DEBUG) {
+            frameDisplay.drawMySelf(canvas)
         }
         canvas.restore()
     }
@@ -121,6 +130,7 @@ class SurfaceDrawController : IDrawController {
                 while (!cancel) {
                     beginDrawTime = SystemClock.elapsedRealtime();
                     doDraw()
+                    frameDisplay.onFrameDrawCompleted()
                     endDrawTime = SystemClock.elapsedRealtime();
                     drawSpaceTime = endDrawTime - beginDrawTime
                     sleepTime = (timeForOneFrame - drawSpaceTime + 0.5).toLong()

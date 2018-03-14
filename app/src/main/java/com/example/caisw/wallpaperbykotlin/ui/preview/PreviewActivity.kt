@@ -7,9 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.SurfaceHolder
 import com.example.caisw.wallpaperbykotlin.core.SurfaceDrawController
-import com.example.caisw.wallpaperbykotlin.module.Constants
-import com.example.caisw.wallpaperbykotlin.spirit.Number
-import com.example.caisw.wallpaperbykotlin.spirit.Ring
+import com.example.caisw.wallpaperbykotlin.spirit.Picture
 
 /**
  * 开发时预览用的界面
@@ -24,8 +22,9 @@ class PreviewActivity : Activity() {
         previewSurfaceView = PreviewSurfaceView(this)
         setContentView(previewSurfaceView);
         surfaceDrawController = SurfaceDrawController(previewSurfaceView)
-        surfaceDrawController.spiritHolder.addSpirit(Ring())
-        surfaceDrawController.spiritHolder.addSpirit(Number(Constants.Number_1))
+//        surfaceDrawController.spiritHolder.addSpirit(Ring())
+//        surfaceDrawController.spiritHolder.addSpirit(Number(Constants.Number_1))
+        surfaceDrawController.spiritHolder.addSpirit(Picture())
         previewSurfaceView.getSurfaceHolder()?.addCallback(object : SurfaceHolder.Callback {
             override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
             }

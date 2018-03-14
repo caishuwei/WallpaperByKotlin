@@ -5,6 +5,7 @@ import android.view.MotionEvent
 import android.view.SurfaceHolder
 import com.example.caisw.wallpaperbykotlin.core.SurfaceDrawController
 import com.example.caisw.wallpaperbykotlin.core.SurfaceHolderProvider
+import com.example.caisw.wallpaperbykotlin.spirit.Picture
 import com.example.caisw.wallpaperbykotlin.spirit.Ring
 
 /**
@@ -18,7 +19,8 @@ class MyWallPaper : WallpaperService() {
         super.onCreate()
         myEngine = MyEngine()
         surfaceDrawController = SurfaceDrawController(myEngine)
-        surfaceDrawController.spiritHolder.addSpirit(Ring())
+//        surfaceDrawController.spiritHolder.addSpirit(Ring())
+        surfaceDrawController.spiritHolder.addSpirit(Picture())
     }
 
     /**
