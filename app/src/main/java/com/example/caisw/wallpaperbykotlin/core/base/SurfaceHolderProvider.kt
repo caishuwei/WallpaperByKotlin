@@ -1,4 +1,4 @@
-package com.example.caisw.wallpaperbykotlin.core
+package com.example.caisw.wallpaperbykotlin.core.base
 
 import android.view.SurfaceHolder
 

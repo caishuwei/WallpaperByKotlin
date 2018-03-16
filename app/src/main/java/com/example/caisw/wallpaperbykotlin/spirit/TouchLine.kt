@@ -32,18 +32,22 @@ class TouchLine : BaseSpirit, Handler.Callback {
     private val handlerThreadHandler: Handler
     private val pointList = LinkedList<MyPointF>()
 
+    private val handlerThread: HandlerThread
+
+    private val pathRectF: RectF
+
     constructor() : super() {
         paint = Paint()
         paint.strokeWidth = 10F
         paint.color = Color.parseColor("#ff87cefa")
-        paint.maskFilter = BlurMaskFilter(DEFAULT_COMET_WIDTH/2, BlurMaskFilter.Blur.INNER)
+        paint.maskFilter = BlurMaskFilter(DEFAULT_COMET_WIDTH / 2, BlurMaskFilter.Blur.INNER)
         paint.strokeCap = Paint.Cap.ROUND
         paint.style = Paint.Style.FILL
         paint.isAntiAlias = true
 
         path = Path()
-
-        val handlerThread = HandlerThread("TouchLine_${this.hashCode()}");
+        pathRectF = RectF()
+        handlerThread = HandlerThread("TouchLine_${this.hashCode()}");
         handlerThread.start()
         handlerThreadHandler = Handler(handlerThread.looper, this)
     }
@@ -51,6 +55,7 @@ class TouchLine : BaseSpirit, Handler.Callback {
     override fun drawMySelf(canvas: Canvas) {
         if (!path.isEmpty) {
             canvas.drawPath(path, paint)
+            boundsRect.set(pathRectF)
         }
     }
 
@@ -101,6 +106,7 @@ class TouchLine : BaseSpirit, Handler.Callback {
         return false
     }
 
+
     private fun updatePath() {
         trimPointList(SystemClock.elapsedRealtime() - POINT_LIFE)
         //1、取得中心路径点
@@ -108,6 +114,7 @@ class TouchLine : BaseSpirit, Handler.Callback {
         val size = centerPois.size
         if (centerPois.size < 4) {//小于4个点不用计算直接返回，构不成彗星
             path.reset()
+            boundsRect.set(0F, 0F, 0F, 0F)
             return
         }
         val leftPois = mutableListOf<MyPointF>()//左侧路径
@@ -160,6 +167,8 @@ class TouchLine : BaseSpirit, Handler.Callback {
             }
         }
         cometPath.close()
+        cometPath.computeBounds(pathRectF, false)
+        pathRectF.inset(-5F, -5F)
         path = cometPath
     }
 
@@ -179,5 +188,10 @@ class TouchLine : BaseSpirit, Handler.Callback {
 
     private fun checkDistance(point: MyPointF, lastPoint: MyPointF): Boolean {
         return Math.max(Math.abs(point.x - lastPoint.x), Math.abs(point.y - lastPoint.y)) > 20
+    }
+
+    override fun release() {
+        super.release()
+        handlerThread.quit()
     }
 }

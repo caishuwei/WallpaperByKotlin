@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.SystemClock
+import android.util.Log
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
 
 /**
@@ -52,6 +53,8 @@ class Frame : BaseSpirit {
         canvas.save()
         canvas.drawText(displayText, MyApplication.instance.screenInfoProvider.screenWidth() * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop, textPaint)
         canvas.restore()
+        boundsRect.set(displayTextRect)
+        boundsRect.offset(MyApplication.instance.screenInfoProvider.screenWidth() * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop)
     }
 
 }

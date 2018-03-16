@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import com.example.caisw.wallpaperbykotlin.core.SurfaceHolderProvider
+import com.example.caisw.wallpaperbykotlin.core.base.SurfaceHolderProvider
 
 /**
  * 预览视图

@@ -1,4 +1,4 @@
-package com.example.caisw.wallpaperbykotlin.core
+package com.example.caisw.wallpaperbykotlin.core.base
 
 /**
  * Created by caisw on 2018/3/12.

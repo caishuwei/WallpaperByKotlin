@@ -1,9 +1,13 @@
 package com.example.caisw.wallpaperbykotlin.core
 
 import android.graphics.Canvas
+import android.graphics.Rect
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.util.Log
+import com.example.caisw.wallpaperbykotlin.core.base.IDrawController
+import com.example.caisw.wallpaperbykotlin.core.base.SurfaceHolderProvider
 import com.example.caisw.wallpaperbykotlin.spirit.BaseSpirit
 import com.example.caisw.wallpaperbykotlin.spirit.Frame
 import java.lang.Exception
@@ -14,12 +18,8 @@ import java.util.concurrent.CopyOnWriteArrayList
  */
 class SurfaceDrawController : IDrawController {
 
-    companion object {
-        var DEBUG = true
-    }
-
     private var drawing: Boolean = false
-    private var drawThread: SurfaceDrawController.DrawThread? = null
+    private var drawThread: DrawThread? = null
     val spiritHolder: SpiritHolder
     private val surfaceHolderProvider: SurfaceHolderProvider
     private val frameDisplay = Frame()
@@ -31,9 +31,13 @@ class SurfaceDrawController : IDrawController {
 
     override fun startDraw() {
         drawing = true
-        if (drawThread != null) {
-            drawThread?.cancel()
-            drawThread = null
+        val dt = drawThread
+        if (dt != null) {
+            if (!dt.cancel) {
+                return
+            } else {
+                drawThread = null
+            }
         }
         drawThread = DrawThread()
         drawThread?.start()
@@ -50,7 +54,13 @@ class SurfaceDrawController : IDrawController {
     private fun doDraw() {
         val surfaceHolder = surfaceHolderProvider.getSurfaceHolder()
         if (surfaceHolder != null) {
-            val canvas: Canvas? = surfaceHolder.lockCanvas()
+            val canvas: Canvas?
+            if (dirtyRect.isEmpty) {
+                canvas = surfaceHolder.lockCanvas()
+            } else {
+                Log.e("Frame", dirtyRect.toString())
+                canvas = surfaceHolder.lockCanvas(dirtyRect)
+            }
             if (canvas != null) {
                 onDraw(canvas)
                 surfaceHolder.unlockCanvasAndPost(canvas)
@@ -58,15 +68,40 @@ class SurfaceDrawController : IDrawController {
         }
     }
 
+    private val dirtyRect = Rect()
+
     private fun onDraw(canvas: Canvas) {
         canvas.drawARGB(255, 0, 0, 0)//清屏
         canvas.save()
+        dirtyRect.set(0, 0, 0, 0)
         val iterator = spiritHolder.spiritList.iterator()
+        var spirit: BaseSpirit
         while (iterator.hasNext()) {
-            iterator.next().drawMySelf(canvas)
+            spirit = iterator.next()
+            if (spirit.isRelease) {
+                spiritHolder.spiritList.remove(spirit)
+            } else {
+                spirit.drawMySelf(canvas)
+                if (WallpaperController.DEBUG) {
+                    spirit.drawBounds(canvas)
+                }
+                dirtyRect.union(
+                        (spirit.boundsRect.left - 0.5F).toInt(),
+                        (spirit.boundsRect.top - 0.5F).toInt(),
+                        (spirit.boundsRect.right + 0.5F).toInt(),
+                        (spirit.boundsRect.bottom + 0.5F).toInt()
+                )
+            }
         }
-        if (DEBUG) {
+        if (WallpaperController.DEBUG) {
             frameDisplay.drawMySelf(canvas)
+            frameDisplay.drawBounds(canvas)
+            dirtyRect.union(
+                    (frameDisplay.boundsRect.left ).toInt(),
+                    (frameDisplay.boundsRect.top - 0.5F).toInt(),
+                    (frameDisplay.boundsRect.right + 0.5F).toInt(),
+                    (frameDisplay.boundsRect.bottom + 0.5F).toInt()
+            )
         }
         canvas.restore()
     }
@@ -118,7 +153,8 @@ class SurfaceDrawController : IDrawController {
             timeForOneFrame = 1000F / frameUpperLimit
         }
 
-        private var cancel: Boolean = false
+        var cancel: Boolean = false
+            private set
         private var drawSpaceTime = 0L
 
         override fun run() {

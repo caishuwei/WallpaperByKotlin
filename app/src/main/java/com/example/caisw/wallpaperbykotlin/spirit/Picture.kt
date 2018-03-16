@@ -19,9 +19,12 @@ class Picture : BaseSpirit {
 
     private var degress: Float
 
+    private val bitmapRectF: RectF
+
     constructor() : super() {
         benxi = BitmapFactory.decodeResource(MyApplication.instance.resources, R.drawable.benxi)
         benxi = pictureDecorate(benxi)
+        bitmapRectF = RectF(0F, 0F, benxi.width.toFloat(), benxi.height.toFloat())
 
         camera = Camera()
         camera.setLocation(0F, 0F, -100F)//设置摄像机位置（一个单位(英寸)72像素，修改Z位置拉远镜头，可以减轻图像变形）
@@ -66,9 +69,10 @@ class Picture : BaseSpirit {
         camera.restore()
         pictureMatrix.preTranslate(-benxi.width / 2F, -benxi.height / 2F)//使用相机进行变换之前进行场景移动，使图片中心在原点上
         pictureMatrix.postScale(scaleRate, scaleRate)//进行矩阵缩放，无法直接在相机里面缩放
-
+        pictureMatrix.mapRect(boundsRect, bitmapRectF)
         //2、场景位移到精灵所在位置进行绘制
         canvas.translate(x, y)
+        boundsRect.offset(x, y)
         canvas.drawBitmap(benxi, pictureMatrix, null)//绘制图片
         canvas.restore()
     }
