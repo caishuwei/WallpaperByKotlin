@@ -1,6 +1,8 @@
 package com.example.caisw.wallpaperbykotlin.app
 
 import android.app.Application
+import android.content.Context
+import androidx.multidex.MultiDex
 
 /**
  * 自定义应用类，用于提供跟随整个应用生命周期的全局变量
@@ -14,14 +16,14 @@ class MyApplication : Application() {
 
     }
 
-    lateinit var screenInfoProvider: ScreenInfoProvider
-        private set
-
     override fun onCreate() {
         super.onCreate()
         MyApplication.instance = this
-        screenInfoProvider = ScreenInfoProvider(this)
     }
 
 
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(base)
+    }
 }

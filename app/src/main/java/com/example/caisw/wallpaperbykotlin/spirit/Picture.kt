@@ -4,6 +4,7 @@ import android.graphics.*
 import android.os.SystemClock
 import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 /**
  * Created by caisw on 2018/3/14.
@@ -31,8 +32,8 @@ class Picture : BaseSpirit {
         pictureMatrix = Matrix()
         createTime = SystemClock.uptimeMillis()
         degress = Math.toDegrees(Math.atan(benxi.width * 1.0 / benxi.height)).toFloat()
-        x = MyApplication.instance.screenInfoProvider.screenWidth() / 2F
-        y = MyApplication.instance.screenInfoProvider.screenHeight() / 2F
+        x = ScreenInfo.WIDTH / 2F
+        y = ScreenInfo.HEIGHT / 2F
 
     }
 

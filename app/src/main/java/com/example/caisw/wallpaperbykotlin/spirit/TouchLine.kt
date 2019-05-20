@@ -15,11 +15,11 @@ import java.util.*
 class TouchLine : BaseSpirit, Handler.Callback {
 
     companion object {
-        val ADD_POINT = 1
-        val CLEAR_POINT = 2
-        val UPDATE_PATH = 3
-        val POINT_LIFE = 500L
-        val DEFAULT_COMET_WIDTH = 50F
+        const val ADD_POINT = 1
+        const val CLEAR_POINT = 2
+        const val UPDATE_PATH = 3
+        const val POINT_LIFE = 500L
+        const val DEFAULT_COMET_WIDTH = 50F
         var SIN_HALF_PI = Math.sin(Math.PI / 2).toFloat()
         var SIN_HALF_PI_ = Math.sin(-Math.PI / 2).toFloat()
         var COS_HALF_PI = Math.cos(Math.PI / 2).toFloat()
@@ -68,39 +68,37 @@ class TouchLine : BaseSpirit, Handler.Callback {
     }
 
     override fun handleMessage(msg: Message?): Boolean {
-        if (msg != null) {
-            when (msg?.what) {
-                ADD_POINT -> {
-                    val point = msg.obj
-                    if (point != null && point is MyPointF) {
-                        val lastPoint = pointList.peekLast()
-                        if (lastPoint != null && !checkDistance(point, lastPoint)) {
-                            return true
-                        }
-                        pointList.offerLast(point)
-                        if (handlerThreadHandler.hasMessages(UPDATE_PATH)) {
-                            handlerThreadHandler.removeMessages(UPDATE_PATH)
-                        }
-                        handlerThreadHandler.sendEmptyMessage(UPDATE_PATH)
+        when (msg?.what) {
+            ADD_POINT -> {
+                val point = msg.obj
+                if (point != null && point is MyPointF) {
+                    val lastPoint = pointList.peekLast()
+                    if (lastPoint != null && !checkDistance(point, lastPoint)) {
+                        return true
                     }
-                    return true
-                }
-                CLEAR_POINT -> {
-                    path.reset()
-                    pointList.clear()
+                    pointList.offerLast(point)
                     if (handlerThreadHandler.hasMessages(UPDATE_PATH)) {
                         handlerThreadHandler.removeMessages(UPDATE_PATH)
                     }
                     handlerThreadHandler.sendEmptyMessage(UPDATE_PATH)
-                    return true
                 }
-                UPDATE_PATH -> {
-                    updatePath()
-                    if (!pointList.isEmpty() && !handlerThreadHandler.hasMessages(UPDATE_PATH)) {
-                        handlerThreadHandler.sendEmptyMessageDelayed(UPDATE_PATH, 30)
-                    }
-                    return true
+                return true
+            }
+            CLEAR_POINT -> {
+                path.reset()
+                pointList.clear()
+                if (handlerThreadHandler.hasMessages(UPDATE_PATH)) {
+                    handlerThreadHandler.removeMessages(UPDATE_PATH)
                 }
+                handlerThreadHandler.sendEmptyMessage(UPDATE_PATH)
+                return true
+            }
+            UPDATE_PATH -> {
+                updatePath()
+                if (!pointList.isEmpty() && !handlerThreadHandler.hasMessages(UPDATE_PATH)) {
+                    handlerThreadHandler.sendEmptyMessageDelayed(UPDATE_PATH, 30)
+                }
+                return true
             }
         }
         return false
@@ -124,7 +122,7 @@ class TouchLine : BaseSpirit, Handler.Callback {
         //其他点偏移
         val vectorPoi = PointF(0f, 0f)
         var currWidth: Float
-        var rate = 1F
+        var rate: Float
         for (i in 1 until centerPois.size - 1) {
             //取得前后两个点组成的向量
             centerPois[i - 1].getVectorWithOtherPoi(centerPois[i + 1], vectorPoi)

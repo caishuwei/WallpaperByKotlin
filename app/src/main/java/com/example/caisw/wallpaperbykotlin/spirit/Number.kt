@@ -2,6 +2,7 @@ package com.example.caisw.wallpaperbykotlin.spirit
 
 import android.graphics.*
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 
 /**
@@ -35,7 +36,7 @@ class Number : BaseSpirit {
 
     override fun drawMySelf(canvas: Canvas) {
         canvas.save()
-        canvas.translate(MyApplication.instance.screenInfoProvider.screenWidth() / 2.toFloat(), MyApplication.instance.screenInfoProvider.screenHeight() / 2.toFloat())
+        canvas.translate(ScreenInfo.WIDTH / 2.toFloat(), ScreenInfo.HEIGHT / 2.toFloat())
         canvas.scale(100F, 100F)
         for (path in pathData) {
             canvas.drawPath(path, paint)

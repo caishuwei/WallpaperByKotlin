@@ -7,6 +7,8 @@ import android.view.MotionEvent
  */
 interface IMotionEventHandler {
 
+    fun needHandleMotionEvent(): Boolean
+
     fun handleMotionEvent(event: MotionEvent)
 
 }

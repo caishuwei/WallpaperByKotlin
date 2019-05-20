@@ -73,7 +73,7 @@ class SurfaceDrawController : IDrawController {
     private fun onDraw(canvas: Canvas) {
         canvas.drawARGB(255, 0, 0, 0)//清屏
         canvas.save()
-        dirtyRect.set(0, 0, 0, 0)
+//        dirtyRect.set(0, 0, 0, 0)
         val iterator = spiritHolder.spiritList.iterator()
         var spirit: BaseSpirit
         while (iterator.hasNext()) {
@@ -85,23 +85,23 @@ class SurfaceDrawController : IDrawController {
                 if (WallpaperController.DEBUG) {
                     spirit.drawBounds(canvas)
                 }
-                dirtyRect.union(
-                        (spirit.boundsRect.left - 0.5F).toInt(),
-                        (spirit.boundsRect.top - 0.5F).toInt(),
-                        (spirit.boundsRect.right + 0.5F).toInt(),
-                        (spirit.boundsRect.bottom + 0.5F).toInt()
-                )
+//                dirtyRect.union(
+//                        (spirit.boundsRect.left - 0.5F).toInt(),
+//                        (spirit.boundsRect.top - 0.5F).toInt(),
+//                        (spirit.boundsRect.right + 0.5F).toInt(),
+//                        (spirit.boundsRect.bottom + 0.5F).toInt()
+//                )
             }
         }
         if (WallpaperController.DEBUG) {
             frameDisplay.drawMySelf(canvas)
             frameDisplay.drawBounds(canvas)
-            dirtyRect.union(
-                    (frameDisplay.boundsRect.left ).toInt(),
-                    (frameDisplay.boundsRect.top - 0.5F).toInt(),
-                    (frameDisplay.boundsRect.right + 0.5F).toInt(),
-                    (frameDisplay.boundsRect.bottom + 0.5F).toInt()
-            )
+//            dirtyRect.union(
+//                    (frameDisplay.boundsRect.left ).toInt(),
+//                    (frameDisplay.boundsRect.top - 0.5F).toInt(),
+//                    (frameDisplay.boundsRect.right + 0.5F).toInt(),
+//                    (frameDisplay.boundsRect.bottom + 0.5F).toInt()
+//            )
         }
         canvas.restore()
     }
@@ -159,9 +159,9 @@ class SurfaceDrawController : IDrawController {
 
         override fun run() {
             super.run()
-            var beginDrawTime = 0L
-            var endDrawTime = 0L
-            var sleepTime = 0L
+            var beginDrawTime : Long
+            var endDrawTime : Long
+            var sleepTime : Long
             try {
                 while (!cancel) {
                     beginDrawTime = SystemClock.elapsedRealtime();

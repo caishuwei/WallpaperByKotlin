@@ -39,16 +39,16 @@ class PreviewActivity : Activity() {
     override fun onBackPressed() {
         AlertDialog.Builder(this)
                 .setTitle("前往设置壁纸")
-                .setNegativeButton("确认", { dialog, which ->
+                .setNegativeButton("确认") { _, _ ->
                     var intent = Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER);
                     startActivity(intent)
-                })
-                .setPositiveButton("退出", { dialog, which ->
+                }
+                .setPositiveButton("退出") { _, _ ->
                     super.onBackPressed()
-                })
-                .setOnCancelListener({ dialog ->
+                }
+                .setOnCancelListener { _ ->
                     super.onBackPressed()
-                })
+                }
                 .create().show()
     }
 

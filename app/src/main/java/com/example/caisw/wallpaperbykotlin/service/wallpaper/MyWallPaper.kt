@@ -11,10 +11,6 @@ import com.example.caisw.wallpaperbykotlin.core.base.SurfaceHolderProvider
  */
 class MyWallPaper : WallpaperService() {
 
-    override fun onCreate() {
-        super.onCreate()
-    }
-
     /**
      * 创建引擎
      */
@@ -25,13 +21,9 @@ class MyWallPaper : WallpaperService() {
     /**
      * 创建内部类：渲染引擎
      */
-    inner class MyEngine : Engine, SurfaceHolderProvider {
+    inner class MyEngine : Engine(), SurfaceHolderProvider {
 
-        private var wallpaperController: WallpaperController
-
-        constructor() : super() {
-            wallpaperController = WallpaperController(this)
-        }
+        private var wallpaperController: WallpaperController = WallpaperController(this)
 
         /**
          * 引擎创建后调用的方法，接收一个SurfaceHolder<br/>
@@ -39,7 +31,7 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onCreate(surfaceHolder: SurfaceHolder?) {
             super.onCreate(surfaceHolder)
-            setTouchEventsEnabled(true);//接收触摸事件
+            setTouchEventsEnabled(wallpaperController.needHandleMotionEvent())//接收触摸事件
             wallpaperController.onCreate()
         }
 

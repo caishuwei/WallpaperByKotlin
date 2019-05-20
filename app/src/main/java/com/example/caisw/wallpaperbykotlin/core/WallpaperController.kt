@@ -14,6 +14,7 @@ import com.example.caisw.wallpaperbykotlin.spirit.TouchLine
  */
 class WallpaperController : IWallpaperLifeCycle, IMotionEventHandler {
 
+
     companion object {
         var DEBUG = true
     }
@@ -33,11 +34,11 @@ class WallpaperController : IWallpaperLifeCycle, IMotionEventHandler {
 //        sdc.spiritHolder.addSpirit(Ring())
 //        sdc.spiritHolder.addSpirit(Number(Constants.Number_1))
         sdc.spiritHolder.addSpirit(Picture())
-        touchLineArray = Array(10, { index ->
+        touchLineArray = Array(10) {
             val touchLine = TouchLine()
             sdc.spiritHolder.addSpirit(touchLine)
             touchLine
-        })
+        }
         surfaceDrawController = sdc
     }
 
@@ -67,6 +68,10 @@ class WallpaperController : IWallpaperLifeCycle, IMotionEventHandler {
             }
         }
 
+    }
+
+    override fun needHandleMotionEvent(): Boolean {
+        return true
     }
 
     override fun handleMotionEvent(event: MotionEvent) {

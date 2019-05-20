@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.os.SystemClock
 import android.util.Log
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 /**
  * Created by caisw on 2018/3/14.
@@ -28,7 +29,7 @@ class Frame : BaseSpirit {
         textPaint.isAntiAlias = true
         textPaint.textSize = 25F
         displayTextRect = Rect()
-        marginTop = MyApplication.instance.screenInfoProvider.dp2px(30F)
+        marginTop = ScreenInfo.dp2px(30F).toInt()
     }
 
     /**
@@ -51,10 +52,10 @@ class Frame : BaseSpirit {
 
     override fun drawMySelf(canvas: Canvas) {
         canvas.save()
-        canvas.drawText(displayText, MyApplication.instance.screenInfoProvider.screenWidth() * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop, textPaint)
+        canvas.drawText(displayText, ScreenInfo.WIDTH * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop, textPaint)
         canvas.restore()
         boundsRect.set(displayTextRect)
-        boundsRect.offset(MyApplication.instance.screenInfoProvider.screenWidth() * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop)
+        boundsRect.offset(ScreenInfo.WIDTH * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop)
     }
 
 }

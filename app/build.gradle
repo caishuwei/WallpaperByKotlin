@@ -3,13 +3,15 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
+    buildToolsVersion rootProject.ext.android.buildToolsVersion
     defaultConfig {
         applicationId "com.example.caisw.wallpaperbykotlin"
-        minSdkVersion 14
-        targetSdkVersion 26
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -20,13 +22,31 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation rootProject.ext.androidX.appcompat
+    implementation rootProject.ext.androidX.annotations
+    implementation rootProject.ext.androidX.material
+    implementation rootProject.ext.androidX.drawerlayout
+    implementation rootProject.ext.androidX.recyclerview
+    implementation rootProject.ext.androidX.viewpager
+    implementation rootProject.ext.androidX.viewpager2
+    implementation rootProject.ext.androidX.cardview
+    implementation rootProject.ext.androidX.multidex
+    implementation rootProject.ext.others.rxjava
+    implementation rootProject.ext.others.rxandroid
+    implementation rootProject.ext.others.dagger
+    kapt rootProject.ext.others.dagger_compiler
+    implementation rootProject.ext.others.rxpermissions
+    implementation rootProject.ext.others.BaseRecyclerViewAdapterHelper
+    implementation rootProject.ext.kotlin.kotlin_stdlib_jdk8
+}
+repositories {
+    mavenCentral()
 }

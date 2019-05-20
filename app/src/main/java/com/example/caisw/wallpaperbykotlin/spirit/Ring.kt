@@ -4,6 +4,7 @@ import android.graphics.*
 import android.os.SystemClock
 import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 /**
  * Created by caisw on 2018/3/12.
@@ -26,12 +27,13 @@ class Ring : BaseSpirit {
     }
 
     override fun drawMySelf(canvas: Canvas) {
-        val scaleX = MyApplication.instance.screenInfoProvider.screenWidth() * 1F / ringW
-        val scaleY = MyApplication.instance.screenInfoProvider.screenHeight() * 1F / ringH
+        val scaleX = ScreenInfo.WIDTH * 1F / ringW
+        val scaleY = ScreenInfo.HEIGHT * 1F / ringH
+
         val scale = Math.min(scaleX, scaleY)
         ringMatrix.reset()
         ringMatrix.postScale(scale, scale)
-        ringMatrix.postTranslate((MyApplication.instance.screenInfoProvider.screenWidth() - scale * ringW) / 2, (MyApplication.instance.screenInfoProvider.screenHeight() - scale * ringH) / 2)
+        ringMatrix.postTranslate((ScreenInfo.WIDTH - scale * ringW) / 2, (ScreenInfo.HEIGHT - scale * ringH) / 2)
         canvas.save()
         canvas.drawFilter = PaintFlagsDrawFilter(0, Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
         canvas.drawBitmap(getCurrDrawableBitmap(), ringMatrix, null)
