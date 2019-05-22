@@ -1,18 +1,17 @@
-package com.example.caisw.wallpaperbykotlin.spirit
+package com.example.caisw.wallpaperbykotlin.core.spirit.impl
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.os.SystemClock
-import android.util.Log
-import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 /**
  * Created by caisw on 2018/3/14.
  */
-class Frame : BaseSpirit {
+class Frame : Spirit {
     private var rate = 0F
     private var frameCount = 0
     private var timeForStartCount = 0L
@@ -37,7 +36,7 @@ class Frame : BaseSpirit {
      *
      * 20帧计算一下帧速，取得平均值
      */
-    fun onFrameDrawCompleted() {
+    private fun onFrameDrawCompleted() {
         frameCount++
         if (frameCount == 20) {
             frameCount = 0
@@ -50,10 +49,9 @@ class Frame : BaseSpirit {
     }
 
 
-    override fun drawMySelf(canvas: Canvas) {
-        canvas.save()
+    override fun draw(canvas: Canvas) {
+        onFrameDrawCompleted()
         canvas.drawText(displayText, ScreenInfo.WIDTH * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop, textPaint)
-        canvas.restore()
         boundsRect.set(displayTextRect)
         boundsRect.offset(ScreenInfo.WIDTH * 1F - displayTextRect.width(), displayTextRect.top * -1F + marginTop)
     }

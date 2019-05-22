@@ -1,16 +1,16 @@
-package com.example.caisw.wallpaperbykotlin.ui.preview
+package com.example.caisw.wallpaperbykotlin.core.surface.impl
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
-import com.example.caisw.wallpaperbykotlin.core.base.SurfaceHolderProvider
+import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 
 /**
  * 预览视图
  * Created by caisw on 2018/3/12.
  */
-class PreviewSurfaceView : SurfaceView, SurfaceHolderProvider {
+class SurfaceView : SurfaceView, SurfaceHolderProvider {
 
     override fun getSurfaceHolder(): SurfaceHolder? {
         return holder

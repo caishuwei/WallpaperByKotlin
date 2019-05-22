@@ -11,6 +11,9 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".ui.preview.PreviewActivity">
+
+        </activity>
+        <activity android:name=".ui.preview.SearchTestActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

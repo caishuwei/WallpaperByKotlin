@@ -1,18 +1,21 @@
-package com.example.caisw.wallpaperbykotlin.spirit
+package com.example.caisw.wallpaperbykotlin.core.spirit.impl
 
 import android.graphics.*
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import android.os.SystemClock
+import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.entities.MyPointF
 import java.util.*
 
 
 /**
+ * 彗星，根据一系列的点组成的轨迹生成一个彗星
+ *
  * Created by caisw on 2018/3/14.
  */
-class TouchLine : BaseSpirit, Handler.Callback {
+class Comet() : Spirit(), Handler.Callback {
 
     companion object {
         const val ADD_POINT = 1
@@ -26,45 +29,49 @@ class TouchLine : BaseSpirit, Handler.Callback {
         var COS_HALF_PI_ = Math.cos(-Math.PI / 2).toFloat()
     }
 
-    private val paint: Paint
+    //彗星的画笔以及彗星的绘制路径
+    private val paint: Paint = Paint()
     private var path: Path
-
-    private val handlerThreadHandler: Handler
-    private val pointList = LinkedList<MyPointF>()
-
+    //由于彗星轨迹计算比较耗时，这里在子线程中做计算并生成绘制路径
     private val handlerThread: HandlerThread
+    private val handlerThreadHandler: Handler
+    //记录轨迹点的集合
+    private val pointList = LinkedList<MyPointF>()
 
     private val pathRectF: RectF
 
-    constructor() : super() {
-        paint = Paint()
+    init {
         paint.strokeWidth = 10F
         paint.color = Color.parseColor("#ff87cefa")
+        //控制绘制图形边缘的模糊效果
         paint.maskFilter = BlurMaskFilter(DEFAULT_COMET_WIDTH / 2, BlurMaskFilter.Blur.INNER)
-        paint.strokeCap = Paint.Cap.ROUND
-        paint.style = Paint.Style.FILL
-        paint.isAntiAlias = true
-
+        paint.strokeCap = Paint.Cap.ROUND//笔触设置为圆形
+        paint.style = Paint.Style.FILL//填充路径
+        paint.isAntiAlias = true//边缘平滑
         path = Path()
         pathRectF = RectF()
-        handlerThread = HandlerThread("TouchLine_${this.hashCode()}");
+        handlerThread = HandlerThread("TouchLine_${this.hashCode()}")
         handlerThread.start()
         handlerThreadHandler = Handler(handlerThread.looper, this)
     }
 
-    override fun drawMySelf(canvas: Canvas) {
+    override fun draw(canvas: Canvas) {
         if (!path.isEmpty) {
             canvas.drawPath(path, paint)
             boundsRect.set(pathRectF)
         }
     }
 
-    fun clearPoints() {
-        handlerThreadHandler.sendEmptyMessage(CLEAR_POINT)
+    /**
+     * 添加一个点，作为彗星的开头
+     */
+    fun addPoint(point: MyPointF) {
+        handlerThreadHandler.obtainMessage(ADD_POINT, point).sendToTarget()
     }
 
-    fun addTouchPoint(point: MyPointF) {
-        handlerThreadHandler.obtainMessage(ADD_POINT, point).sendToTarget()
+    override fun destroy() {
+        super.destroy()
+        handlerThread.quit()//强制中断线程，不管队列里是否还有任务未处理
     }
 
     override fun handleMessage(msg: Message?): Boolean {
@@ -95,8 +102,13 @@ class TouchLine : BaseSpirit, Handler.Callback {
             }
             UPDATE_PATH -> {
                 updatePath()
-                if (!pointList.isEmpty() && !handlerThreadHandler.hasMessages(UPDATE_PATH)) {
-                    handlerThreadHandler.sendEmptyMessageDelayed(UPDATE_PATH, 30)
+                if (!pointList.isEmpty()) {
+                    if (!handlerThreadHandler.hasMessages(UPDATE_PATH)) {
+                        handlerThreadHandler.sendEmptyMessageDelayed(UPDATE_PATH, 30)
+                    }
+                } else {
+                    //所有点都死亡了，那么这里可以结束精灵了
+                    destroy()
                 }
                 return true
             }
@@ -104,7 +116,9 @@ class TouchLine : BaseSpirit, Handler.Callback {
         return false
     }
 
-
+    /**
+     *
+     */
     private fun updatePath() {
         trimPointList(SystemClock.elapsedRealtime() - POINT_LIFE)
         //1、取得中心路径点
@@ -188,8 +202,4 @@ class TouchLine : BaseSpirit, Handler.Callback {
         return Math.max(Math.abs(point.x - lastPoint.x), Math.abs(point.y - lastPoint.y)) > 20
     }
 
-    override fun release() {
-        super.release()
-        handlerThread.quit()
-    }
 }

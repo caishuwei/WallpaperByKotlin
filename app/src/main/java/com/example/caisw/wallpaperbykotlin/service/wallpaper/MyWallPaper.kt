@@ -3,8 +3,8 @@ package com.example.caisw.wallpaperbykotlin.service.wallpaper
 import android.service.wallpaper.WallpaperService
 import android.view.MotionEvent
 import android.view.SurfaceHolder
-import com.example.caisw.wallpaperbykotlin.core.WallpaperController
-import com.example.caisw.wallpaperbykotlin.core.base.SurfaceHolderProvider
+import com.example.caisw.wallpaperbykotlin.core.SceneController
+import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 
 /**
  * Created by caisw on 2018/3/2.
@@ -23,7 +23,7 @@ class MyWallPaper : WallpaperService() {
      */
     inner class MyEngine : Engine(), SurfaceHolderProvider {
 
-        private var wallpaperController: WallpaperController = WallpaperController(this)
+        private var wallpaperController: SceneController = SceneController(this)
 
         /**
          * 引擎创建后调用的方法，接收一个SurfaceHolder<br/>

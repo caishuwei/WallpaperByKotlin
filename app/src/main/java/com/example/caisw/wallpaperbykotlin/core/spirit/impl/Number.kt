@@ -1,14 +1,14 @@
-package com.example.caisw.wallpaperbykotlin.spirit
+package com.example.caisw.wallpaperbykotlin.core.spirit.impl
 
 import android.graphics.*
-import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 
 /**
  * Created by caisw on 2018/3/13.
  */
-class Number : BaseSpirit {
+class Number : Spirit {
     private val pointData: Array<MutableList<Point>>
     private val pathData: Array<Path>
     private val paint: Paint
@@ -34,7 +34,7 @@ class Number : BaseSpirit {
     }
 
 
-    override fun drawMySelf(canvas: Canvas) {
+    override fun draw(canvas: Canvas) {
         canvas.save()
         canvas.translate(ScreenInfo.WIDTH / 2.toFloat(), ScreenInfo.HEIGHT / 2.toFloat())
         canvas.scale(100F, 100F)

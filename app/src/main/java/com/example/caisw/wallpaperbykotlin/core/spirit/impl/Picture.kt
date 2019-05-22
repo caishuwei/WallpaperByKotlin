@@ -1,22 +1,23 @@
-package com.example.caisw.wallpaperbykotlin.spirit
+package com.example.caisw.wallpaperbykotlin.core.spirit.impl
 
 import android.graphics.*
 import android.os.SystemClock
 import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 /**
  * Created by caisw on 2018/3/14.
  */
-class Picture : BaseSpirit {
+class Picture : Spirit {
     private var scaleRate = 0.8F
 
     private var benxi: Bitmap//图片
     private val camera: Camera//3d变换应用
     private var pictureMatrix: Matrix
     private var createTime = 0L
-    private var loopTime = 5 * 1000
+    private var loopTime = 10 * 1000
 
     private var degress: Float
 
@@ -61,7 +62,7 @@ class Picture : BaseSpirit {
         return bm
     }
 
-    override fun drawMySelf(canvas: Canvas) {
+    override fun draw(canvas: Canvas) {
         canvas.save()
         //1、生成图片变幻矩阵（图片的缩放，旋转，位移）
         camera.save()

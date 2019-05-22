@@ -1,15 +1,16 @@
-package com.example.caisw.wallpaperbykotlin.spirit
+package com.example.caisw.wallpaperbykotlin.core.spirit.impl
 
 import android.graphics.*
 import android.os.SystemClock
 import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.app.MyApplication
+import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 /**
  * Created by caisw on 2018/3/12.
  */
-class Ring : BaseSpirit {
+class Ring : Spirit {
 
     private val frameUpdateTime = 50L
     private val ringW = 75//圆环图元宽度
@@ -26,7 +27,7 @@ class Ring : BaseSpirit {
         createTime = SystemClock.uptimeMillis()
     }
 
-    override fun drawMySelf(canvas: Canvas) {
+    override fun draw(canvas: Canvas) {
         val scaleX = ScreenInfo.WIDTH * 1F / ringW
         val scaleY = ScreenInfo.HEIGHT * 1F / ringH
 

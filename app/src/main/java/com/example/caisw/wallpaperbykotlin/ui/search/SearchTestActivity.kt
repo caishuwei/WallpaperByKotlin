@@ -6,16 +6,36 @@ import android.app.WallpaperManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import com.example.caisw.wallpaperbykotlin.core.SceneController
+import com.example.caisw.wallpaperbykotlin.core.spirit.group.Scene
 import com.example.caisw.wallpaperbykotlin.core.surface.impl.SurfaceView
+import com.example.caisw.wallpaperbykotlin.utils.MyGestureDetector
 
 /**
  * 开发时预览用的界面
  * Created by caisw on 2018/3/2.
  */
-class PreviewActivity : Activity() {
+class SearchTestActivity : Activity() {
     private lateinit var surfaceView: SurfaceView
     private lateinit var wallpaperController: SceneController
+//    private var myGestureDetector = object : MyGestureDetector() {
+//
+//        override fun onScroll(e1: MotionEvent?, e2: MotionEvent?, distanceX: Float, distanceY: Float): Boolean {
+//            scene.translate(-distanceX, -distanceY)
+//            return super.onScroll(e1, e2, distanceX, distanceY)
+//        }
+//
+//        override fun onScale(detector: ScaleGestureDetector?): Boolean {
+//            detector?.let {
+//                scene.scale(it.scaleFactor,it.scaleFactor,it.focusX,it.focusY)
+//            }
+//            return super.onScale(detector)
+//        }
+//
+//    }
+//    private val scene = Scene();
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         surfaceView = SurfaceView(this)
