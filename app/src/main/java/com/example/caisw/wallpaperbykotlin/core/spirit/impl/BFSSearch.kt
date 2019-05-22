@@ -40,7 +40,7 @@ class BFSSearch : GridMap(60) {
                     addNode(node.x, node.y + 1, node)
                 }
                 if (!nodeQueue.isEmpty()) {
-                    mainHandler.postDelayed(this, 50)
+                    mainHandler.postDelayed(this, 10)
                 } else {
                     currNode = null
                 }
@@ -50,14 +50,19 @@ class BFSSearch : GridMap(60) {
         private fun addNode(x: Int, y: Int, node: Node) {
             if (x in 0 until count
                     && y in 0 until count
-                    && map[x][y] == 0) {
-                map[x][y] = FLAG_WAITING_CHECK
-                nodeQueue.offer(Node(x, y, node))
+            ) {
+                if (map[x][y] == 0) {
+                    map[x][y] = FLAG_WAITING_CHECK
+                    nodeQueue.offer(Node(x, y, node))
+                } else if (map[x][y] == FLAG_END) {
+                    nodeQueue.offer(Node(x, y, node))
+                }
             }
         }
     }
 
     private lateinit var startNode: Node
+
     init {
         randomStart()
         randomEnd()
