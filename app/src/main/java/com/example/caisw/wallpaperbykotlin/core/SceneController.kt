@@ -8,8 +8,9 @@ import com.example.caisw.wallpaperbykotlin.core.base.ISceneLifeCycle
 import com.example.caisw.wallpaperbykotlin.core.draw.impl.SurfaceDrawController
 import com.example.caisw.wallpaperbykotlin.core.spirit.group.Scene
 import com.example.caisw.wallpaperbykotlin.core.spirit.group.TouchLine
-import com.example.caisw.wallpaperbykotlin.core.spirit.impl.BFSSearch
 import com.example.caisw.wallpaperbykotlin.core.spirit.impl.Frame
+import com.example.caisw.wallpaperbykotlin.core.spirit.search.BreadthFirstSearch
+import com.example.caisw.wallpaperbykotlin.core.spirit.search.DepthFirstSearch
 import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 import com.example.caisw.wallpaperbykotlin.utils.MyGestureDetector
 
@@ -41,14 +42,15 @@ class SceneController(private var surfaceHolderProvider: SurfaceHolderProvider) 
         }
 
     }
-    private val bfsSearch = BFSSearch()
+    private val breadthFirstSearch = BreadthFirstSearch()
+    private val depthFirstSearch = DepthFirstSearch()
     override fun onCreate() {
         Log.e("SceneController", "onCreate->${this.hashCode()}")
         val sdc = SurfaceDrawController(surfaceHolderProvider)
 //        sdc.spiritHolder.addSpirit(Ring())
 //        sdc.spiritHolder.addSpirit(Number(Constants.Number_1))
 //        scene.addSpirit(Picture())
-        scene.addSpirit(bfsSearch)
+        scene.addSpirit(depthFirstSearch)
 
         sdc.spiritHolder.addSpirit(scene)
         sdc.spiritHolder.addSpirit(touchLine)
@@ -83,15 +85,15 @@ class SceneController(private var surfaceHolderProvider: SurfaceHolderProvider) 
 //        myGestureDetector.onTouchEvent(event)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                bfsSearch.destroySearch()
-                bfsSearch.setObstacle(event.x, event.y)
+                depthFirstSearch.end()
+                depthFirstSearch.setObstacle(event.x, event.y)
             }
             MotionEvent.ACTION_MOVE -> {
-                bfsSearch.setObstacle(event.x, event.y)
+                depthFirstSearch.setObstacle(event.x, event.y)
             }
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                bfsSearch.setObstacle(event.x, event.y)
-                bfsSearch.startSearch()
+                depthFirstSearch.setObstacle(event.x, event.y)
+                depthFirstSearch.start()
             }
         }
     }
