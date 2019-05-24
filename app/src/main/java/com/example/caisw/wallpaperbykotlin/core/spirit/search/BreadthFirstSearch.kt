@@ -11,7 +11,7 @@ import java.util.*
  * 会比较耗性能，但找到的路径一定是最优的
  *
  */
-class BreadthFirstSearch : SearchBase(60) {
+class BreadthFirstSearch : SearchBase(20) {
     //用队列实现即可，先近先出（进入的节点由近及远）
     private val nodeQueue = LinkedList<Node>()
     private var currNode: Node? = null

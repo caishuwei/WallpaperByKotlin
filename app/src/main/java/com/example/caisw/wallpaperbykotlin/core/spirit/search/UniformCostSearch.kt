@@ -5,14 +5,23 @@ import com.example.caisw.wallpaperbykotlin.entities.NodeWithPathCost
 import java.util.*
 
 /**
- * 一致代价搜索UCS
+ * 一致代价搜索UCS（寻找最短路径）
  *
  * BFS是基于每一步花费的代价相同的图上，对于通过每一格的花费的代价不同的图来讲，BFS并不是最好的做法
  *
- * UCS脱胎于BFS，基于每一格花费的代价不同，按照当前路径花费的代价高低加入队列，由低到高排序，
+ * BFS是特定情况下的UCS
+ * UCS基于每一格花费的代价不同，按照当前路径花费的代价高低加入队列，由低到高排序，
  * 取出最低花费的搜索路径，寻找下一步，判断是否是终点，不是则按照当前花费加入队列
+ *
+ * BFS可以确定寻找的下一个路径距离是大于或等于之前的路径的，所以对走过的点可以排除出检索范围
+ *
+ * UCS由于不同的两个点组成的路径代价不同，所以已经走过的点从别的地方走可能又变近了，所以之前走过的点，别的路径也可以走，
+ * 而搜索过程是将路径短的开始搜，直到终点，这个距离内的路径有好多种排列组合，所以终点距离稍远的话，就要花费巨大的代价去搜索
+ * 这里已10*10的范围为例
+ *
+ * 这个算法是属于盲目搜索，用这个做寻路很亏，接下来了解启发式搜索，会大大提高寻路性能
  */
-class UniformCostSearch : SearchBase(60) {
+class UniformCostSearch : SearchBase(10) {
     private val BASE_HEIGHT = 1000//基础高度
     private val HEIGHT_VALUE_RAGNE = 6//高度变化范围（整个地图横向才60，高度的取值要适当，免得某些地方变成珠穆朗玛峰）
     val height = Array(count) { IntArray(count) }//高度信息存储
@@ -166,7 +175,7 @@ class UniformCostSearch : SearchBase(60) {
         //绘制当前检索的路径
         var node = currNode
         while (node != null) {
-            if (map[node.x][node.y] > 0) {
+            if (map[node.x][node.y] == FLAG_DEFAULT) {
                 commonPaint.color = COLOR_PATH
                 drawRect(node.x, node.y, canvas, commonPaint)
             }
@@ -175,7 +184,7 @@ class UniformCostSearch : SearchBase(60) {
     }
 
     private fun getHeightColor(height: Int): Int {
-        var rate = (height + HEIGHT_VALUE_RAGNE / 2F - BASE_HEIGHT)
+        var rate = (height + HEIGHT_VALUE_RAGNE / 2F - BASE_HEIGHT) / HEIGHT_VALUE_RAGNE
 
         val alpha = (192 - 90 * rate).toInt()
 //        val startA = COLOR_START ushr 24

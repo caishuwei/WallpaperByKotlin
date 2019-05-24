@@ -40,4 +40,9 @@ abstract class BaseSearchProject(surfaceHolderProvider: SurfaceHolderProvider) :
         }
     }
 
+
+    override fun onDestroy() {
+        searchBase.end()
+        super.onDestroy()
+    }
 }

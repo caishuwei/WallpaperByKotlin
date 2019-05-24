@@ -15,7 +15,7 @@ import java.util.*
  *
  * 深度搜索一开始被应用于走迷宫，往一条分支走到底，发现没路了，就切换别的分支继续走
  */
-class DepthFirstSearch : SearchBase(60) {
+class DepthFirstSearch : SearchBase(20) {
     private val nodeStack = Stack<Node>()
     private var currNode: Node? = null
     //检索深度限制，无障碍的情况下最远的两个点距离是count+count，这里乘以2作为查询路径的最大值
