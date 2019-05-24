@@ -3,7 +3,7 @@ package com.example.caisw.wallpaperbykotlin.service.wallpaper
 import android.service.wallpaper.WallpaperService
 import android.view.MotionEvent
 import android.view.SurfaceHolder
-import com.example.caisw.wallpaperbykotlin.core.SceneController
+import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
 import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 
 /**
@@ -23,7 +23,7 @@ class MyWallPaper : WallpaperService() {
      */
     inner class MyEngine : Engine(), SurfaceHolderProvider {
 
-        private var wallpaperController: SceneController = SceneController(this)
+        private var project = ProjectFactory.getProject(ProjectFactory.TAG_BEN_XI, this)
 
         /**
          * 引擎创建后调用的方法，接收一个SurfaceHolder<br/>
@@ -31,8 +31,10 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onCreate(surfaceHolder: SurfaceHolder?) {
             super.onCreate(surfaceHolder)
-            setTouchEventsEnabled(wallpaperController.needHandleMotionEvent())//接收触摸事件
-            wallpaperController.onCreate()
+            project?.let {
+                setTouchEventsEnabled(it.needHandleMotionEvent())//接收触摸事件
+            }
+            project?.onCreate()
         }
 
         /**
@@ -41,9 +43,9 @@ class MyWallPaper : WallpaperService() {
         override fun onVisibilityChanged(visible: Boolean) {
             super.onVisibilityChanged(visible)
             if (visible) {
-                wallpaperController.onResume()
+                project?.onResume()
             } else {
-                wallpaperController.onPause()
+                project?.onPause()
             }
         }
 
@@ -52,7 +54,7 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onSurfaceCreated(holder: SurfaceHolder?) {
             super.onSurfaceCreated(holder)
-            wallpaperController.onResume()
+            project?.onResume()
         }
 
         /**
@@ -67,7 +69,7 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
             super.onSurfaceDestroyed(holder)
-            wallpaperController.onPause()
+            project?.onPause()
         }
 
         /**
@@ -76,7 +78,7 @@ class MyWallPaper : WallpaperService() {
         override fun onTouchEvent(event: MotionEvent?) {
             super.onTouchEvent(event)
             if (event != null) {
-                wallpaperController.handleMotionEvent(event)
+                project?.handleMotionEvent(event)
             }
         }
 
@@ -92,7 +94,7 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onDestroy() {
             super.onDestroy()
-            wallpaperController.onDestroy()
+            project?.onDestroy()
         }
 
     }

@@ -1,12 +1,14 @@
 package com.example.caisw.wallpaperbykotlin.entities
 
-open class Node {
+class NodeWithPathCost {
+
+    var cost = 0f
     val x: Int
     val y: Int
-    val parent: Node?
+    val parent: NodeWithPathCost?
     var step: Int = 0
 
-    constructor(x: Int, y: Int, parent: Node?) {
+    constructor(x: Int, y: Int, parent: NodeWithPathCost?) {
         this.x = x
         this.y = y
         this.parent = parent
@@ -14,4 +16,5 @@ open class Node {
             step = parent.step + 1
         }
     }
+
 }

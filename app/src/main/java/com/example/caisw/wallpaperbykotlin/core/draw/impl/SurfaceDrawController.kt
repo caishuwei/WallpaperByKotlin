@@ -6,7 +6,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
 import android.util.Log
-import com.example.caisw.wallpaperbykotlin.core.SceneController
 import com.example.caisw.wallpaperbykotlin.core.draw.IDrawController
 import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
@@ -99,9 +98,7 @@ class SurfaceDrawController(private val surfaceHolderProvider: SurfaceHolderProv
         while (iterator.hasNext()) {
             spirit = iterator.next()
             spirit.draw(canvas)
-            if (SceneController.DEBUG) {
-                spirit.drawBounds(canvas)
-            }
+//                spirit.drawBounds(canvas)
 //                dirtyRect.union(
 //                        (spirit.boundsRect.left - 0.5F).toInt(),
 //                        (spirit.boundsRect.top - 0.5F).toInt(),

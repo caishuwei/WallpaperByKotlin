@@ -6,7 +6,8 @@ import android.app.WallpaperManager
 import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
-import com.example.caisw.wallpaperbykotlin.core.SceneController
+import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
+import com.example.caisw.wallpaperbykotlin.core.project.IProject
 import com.example.caisw.wallpaperbykotlin.core.surface.impl.SurfaceView
 
 /**
@@ -15,23 +16,23 @@ import com.example.caisw.wallpaperbykotlin.core.surface.impl.SurfaceView
  */
 class PreviewActivity : Activity() {
     private lateinit var surfaceView: SurfaceView
-    private lateinit var wallpaperController: SceneController
+    private var project: IProject? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         surfaceView = SurfaceView(this)
         setContentView(surfaceView);
-        wallpaperController = SceneController(surfaceView)
-        wallpaperController.onCreate()
+        project = ProjectFactory.getProject(ProjectFactory.TAG_BEN_XI, surfaceView)
+        project?.onCreate()
     }
 
     override fun onResume() {
         super.onResume()
-        wallpaperController.onResume()
+        project?.onResume()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
-            wallpaperController.handleMotionEvent(event)
+            project?.handleMotionEvent(event)
         }
         return true
     }
@@ -55,12 +56,12 @@ class PreviewActivity : Activity() {
 
     override fun onPause() {
         super.onPause()
-        wallpaperController.onPause()
+        project?.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        wallpaperController.onDestroy()
+        project?.onDestroy()
     }
 
 
