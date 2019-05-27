@@ -1,7 +1,6 @@
 package com.example.caisw.wallpaperbykotlin.core.spirit.search
 
 import android.graphics.Canvas
-import com.example.caisw.wallpaperbykotlin.entities.NodeWithPathCost
 import java.util.*
 
 /**
@@ -25,8 +24,8 @@ class UniformCostSearch : SearchBase(10) {
     private val BASE_HEIGHT = 1000//基础高度
     private val HEIGHT_VALUE_RAGNE = 6//高度变化范围（整个地图横向才60，高度的取值要适当，免得某些地方变成珠穆朗玛峰）
     val height = Array(count) { IntArray(count) }//高度信息存储
-    private val nodeLinkList = LinkedList<NodeWithPathCost>()
-    private var currNode: NodeWithPathCost? = null
+    private val nodeLinkList = LinkedList<Node>()
+    private var currNode: Node? = null
 
     init {
         //为空白区域生成高度信息,两个不同高度区域间的跨越代价不同，用勾股定理来计算：水平方向距离 = 1,高度差 = ?,求斜边
@@ -82,7 +81,7 @@ class UniformCostSearch : SearchBase(10) {
         return false
     }
 
-    private fun insertToLinkList(nearNode: NodeWithPathCost) {
+    private fun insertToLinkList(nearNode: Node) {
         //确定这个点不在当前的路径里面
         var parent = nearNode.parent
         while (parent != null) {
@@ -108,15 +107,15 @@ class UniformCostSearch : SearchBase(10) {
         nodeLinkList.add(index, nearNode)
     }
 
-    private fun createNode(x: Int, y: Int, node: NodeWithPathCost): NodeWithPathCost? {
+    private fun createNode(x: Int, y: Int, node: Node): Node? {
         if (x in 0 until count
                 && y in 0 until count
         ) {
-            var result: NodeWithPathCost? = null
+            var result: Node? = null
             if (map[x][y] == FLAG_DEFAULT) {
-                result = NodeWithPathCost(x, y, node)
+                result = Node(x, y, node)
             } else if (map[x][y] == FLAG_END) {
-                result = NodeWithPathCost(x, y, node)
+                result = Node(x, y, node)
             }
             return result
         }
@@ -127,8 +126,8 @@ class UniformCostSearch : SearchBase(10) {
         currNode = null
         nodeLinkList.clear()
         //将起点加入检索队列
-        startNode?.let {
-            nodeLinkList.offer(NodeWithPathCost(it.x, it.y, null))
+        startPoint?.let {
+            nodeLinkList.offer(Node(it.x, it.y, null))
         }
         super.start()
     }
@@ -204,4 +203,23 @@ class UniformCostSearch : SearchBase(10) {
         return alpha shl 24 or (COLOR_PATH and 0x00ffffff)
     }
 
+
+    inner class Node {
+
+        var cost = 0f
+        val x: Int
+        val y: Int
+        val parent: Node?
+        var step: Int = 0
+
+        constructor(x: Int, y: Int, parent: Node?) {
+            this.x = x
+            this.y = y
+            this.parent = parent
+            if (parent != null) {
+                step = parent.step + 1
+            }
+        }
+
+    }
 }

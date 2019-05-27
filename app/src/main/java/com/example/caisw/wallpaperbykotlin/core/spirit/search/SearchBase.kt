@@ -3,10 +3,10 @@ package com.example.caisw.wallpaperbykotlin.core.spirit.search
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Point
 import android.os.Handler
 import android.os.Looper
 import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
-import com.example.caisw.wallpaperbykotlin.entities.Node
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
 open class SearchBase(val count: Int) : Spirit() {
@@ -34,8 +34,8 @@ open class SearchBase(val count: Int) : Spirit() {
     private val updateTask = UpdateTask()
 
 
-    var startNode: Node? = null
-    var endNode: Node? = null
+    var startPoint = Point()
+    var endPoint = Point()
 
     init {
         mapPaint.strokeCap = Paint.Cap.SQUARE
@@ -58,7 +58,7 @@ open class SearchBase(val count: Int) : Spirit() {
         val y = (Math.random() * count).toInt()
         if (map[x][y] == 0) {
             map[x][y] = FLAG_END
-            endNode = Node(x, y, null)
+            endPoint = Point(x, y)
         } else {
             randomEnd()
         }
@@ -72,7 +72,7 @@ open class SearchBase(val count: Int) : Spirit() {
         val y = (Math.random() * count).toInt()
         if (map[x][y] == 0) {
             map[x][y] = FLAG_START
-            startNode = Node(x, y, null)
+            startPoint = Point(x, y)
         } else {
             randomStart()
         }

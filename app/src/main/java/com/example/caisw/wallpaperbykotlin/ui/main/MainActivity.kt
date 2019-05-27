@@ -44,7 +44,11 @@ class MainActivity : BaseActivity() {
             )
         }
         v_a.setOnClickListener {
-
+            CommonFragmentActivity.openActivity(
+                    this@MainActivity,
+                    ProjectDisplayFragment::class.java,
+                    ProjectDisplayFragment.createArguments(ProjectFactory.TAG_A_STAR)
+            )
         }
         v_ida.setOnClickListener {
 

@@ -1,7 +1,6 @@
 package com.example.caisw.wallpaperbykotlin.core.spirit.search
 
 import android.graphics.Canvas
-import com.example.caisw.wallpaperbykotlin.entities.Node
 import java.util.*
 
 /**
@@ -15,7 +14,7 @@ import java.util.*
  *
  * 深度搜索一开始被应用于走迷宫，往一条分支走到底，发现没路了，就切换别的分支继续走
  */
-class DepthFirstSearch : SearchBase(20) {
+class DepthFirstSearch : SearchBase(60) {
     private val nodeStack = Stack<Node>()
     private var currNode: Node? = null
     //检索深度限制，无障碍的情况下最远的两个点距离是count+count，这里乘以2作为查询路径的最大值
@@ -129,7 +128,7 @@ class DepthFirstSearch : SearchBase(20) {
         currNode = null
         nodeStack.clear()
         //将起点加入检索队列
-        nodeStack.push(startNode)
+        nodeStack.push(Node(startPoint.x, startPoint.y, null))
         super.start()
     }
 
@@ -198,5 +197,19 @@ class DepthFirstSearch : SearchBase(20) {
         val alpha = (192 - 90 * rate).toInt()
         return alpha shl 24 or (COLOR_PATH and 0x00ffffff)
     }
+    inner class Node {
+        val x: Int
+        val y: Int
+        val parent: Node?
+        var step: Int = 0
 
+        constructor(x: Int, y: Int, parent: Node?) {
+            this.x = x
+            this.y = y
+            this.parent = parent
+            if (parent != null) {
+                step = parent.step + 1
+            }
+        }
+    }
 }

@@ -4,91 +4,57 @@ import android.graphics.Canvas
 import java.util.*
 
 /**
- * 广度优先搜索
- * <br/>
- * 从出发点开始向外检索，由近及远，一层一层搜索直到到达目标位置，
- * 会比较耗性能，但找到的路径一定是最优的
+ * A*算法，是BFS的优化，在BFS的基础上加上用启发函数判断接下去应该走的方向
  *
+ * BFS是从距离起点最近的点开始找，犹如洪水向四面八方扩散，边缘的点距离都是相等的，扩散到终点就找到了
+ *
+ * A*算法在此基础上，加上当前点到终点的代价作为启发值，这样同一层的点越往终点方向的点启发值越低，先从启发值小的路走
  */
-class BreadthFirstSearch : SearchBase(60) {
-    //用队列实现即可，先近先出（进入的节点由近及远）
-    private val nodeQueue: Queue<Node> = LinkedList<Node>()
+class AStar : SearchBase(60) {
+    val nodeList = LinkedList<Node>()
     private var currNode: Node? = null
 
+    override fun start() {
+        nodeList.clear()
+        currNode = null
+        startPoint?.let {
+            nodeList.offer(Node(it.x, it.y, null))
+        }
+        super.start()
+    }
+
+    override fun end() {
+        //清除检索过程产生的标记
+        for (x in 0 until count) {
+            for (y in 0 until count) {
+                if (map[x][y] == FLAG_WAITING_CHECK || map[x][y] > 0) {
+                    map[x][y] = 0
+                }
+            }
+        }
+        nodeList.clear()
+        currNode = null
+        super.end()
+    }
+
     override fun nextStep(): Boolean {
-        super.nextStep()
-        if (!nodeQueue.isEmpty()) {
-            val node = nodeQueue.poll()
+        if (!nodeList.isEmpty()) {
+            val node = nodeList.poll()
             currNode = node
             if (map[node.x][node.y] == FLAG_END) {
                 //已经找到终点
-                nodeQueue.clear()
+                nodeList.clear()
                 return false
             } else {
                 //不是终点
                 if (map[node.x][node.y] != FLAG_START) {
                     //标记这个点已经检索过
-                    map[node.x][node.y] = node.step
+                    map[node.x][node.y] = node.g.toInt()
                 }
-                //将临近点加入队列(左上右下)
-                //左
-                var nearNode = createNode(node.x - 1, node.y, node)
-                if (nearNode != null) {
-                    when (map[nearNode.x][nearNode.y]) {
-                        FLAG_END -> {
-                            currNode = nearNode
-                            nodeQueue.clear()
-                            return false
-                        }
-                        FLAG_WAITING_CHECK -> {
-                            nodeQueue.offer(nearNode)
-                        }
-                    }
-                }
-                //上
-                nearNode = createNode(node.x, node.y - 1, node)
-                if (nearNode != null) {
-                    when (map[nearNode.x][nearNode.y]) {
-                        FLAG_END -> {
-                            currNode = nearNode
-                            nodeQueue.clear()
-                            return false
-                        }
-                        FLAG_WAITING_CHECK -> {
-                            nodeQueue.offer(nearNode)
-                        }
-                    }
-                }
-                //右
-                nearNode = createNode(node.x + 1, node.y, node)
-                if (nearNode != null) {
-                    when (map[nearNode.x][nearNode.y]) {
-                        FLAG_END -> {
-                            currNode = nearNode
-                            nodeQueue.clear()
-                            return false
-                        }
-                        FLAG_WAITING_CHECK -> {
-                            nodeQueue.offer(nearNode)
-                        }
-                    }
-                }
-                //下
-                nearNode = createNode(node.x, node.y + 1, node)
-                if (nearNode != null) {
-                    when (map[nearNode.x][nearNode.y]) {
-                        FLAG_END -> {
-                            currNode = nearNode
-                            nodeQueue.clear()
-                            return false
-                        }
-                        FLAG_WAITING_CHECK -> {
-                            nodeQueue.offer(nearNode)
-                        }
-                    }
-                }
+                insertNearNodes(node)
+
             }
-            if (nodeQueue.isEmpty()) {
+            if (nodeList.isEmpty()) {
                 //已经检索完所有点都没找到
                 currNode = null
             } else {
@@ -99,13 +65,64 @@ class BreadthFirstSearch : SearchBase(60) {
         return false
     }
 
+    /**
+     * 将附近节点，插入搜寻队列
+     */
+    open fun insertNearNodes(node: Node) {
+        //左
+        var nearNode = createNode(node.x - 1, node.y, node)
+        if (nearNode != null) {
+            insertToLinkList(nearNode);
+        }
+        //上
+        nearNode = createNode(node.x, node.y - 1, node)
+        if (nearNode != null) {
+            insertToLinkList(nearNode);
+        }
+        //右
+        nearNode = createNode(node.x + 1, node.y, node)
+        if (nearNode != null) {
+            insertToLinkList(nearNode);
+        }
+        //下
+        nearNode = createNode(node.x, node.y + 1, node)
+        if (nearNode != null) {
+            insertToLinkList(nearNode);
+        }
+    }
+
+    /**
+     * 将节点插入队列
+     */
+    open fun insertToLinkList(nearNode: Node) {
+        //计算代价
+        val parent = nearNode.parent
+        parent?.let {
+            nearNode.g = it.g + 1
+        }
+        //使用曼哈顿距离，计算与终点的距离
+        nearNode.h = (Math.abs(nearNode.x - endPoint.x) + Math.abs(nearNode.y - endPoint.y)).toFloat()
+        //欧几里得距离
+//        nearNode.h = Math.sqrt(Math.pow((nearNode.x - endPoint.x).toDouble(), 2.0) + Math.pow((nearNode.y - endPoint.y).toDouble(), 2.0)).toFloat()
+        //按代价大小插入队列
+        val iterator = nodeList.iterator()
+        var index = 0
+        while (iterator.hasNext()) {
+            if (iterator.next().f() > nearNode.f()) {
+                break
+            }
+            index++
+        }
+        nodeList.add(index, nearNode)
+    }
+
     private fun createNode(x: Int, y: Int, node: Node): Node? {
         if (x in 0 until count
                 && y in 0 until count
         ) {
             var result: Node? = null
             if (map[x][y] == FLAG_DEFAULT) {
-                map[x][y] = FLAG_WAITING_CHECK
+                map[x][y] = FLAG_WAITING_CHECK//标记为待检查，避免该点出现在多个路径中
                 result = Node(x, y, node)
             } else if (map[x][y] == FLAG_END) {
                 result = Node(x, y, node)
@@ -113,29 +130,6 @@ class BreadthFirstSearch : SearchBase(60) {
             return result
         }
         return null
-    }
-
-    override fun start() {
-        currNode = null
-        nodeQueue.clear()
-        //将起点加入检索队列
-        nodeQueue.offer(Node(startPoint.x, startPoint.y, null))
-        super.start()
-    }
-
-    override fun end() {
-        super.end()
-        //清除检索过程产生的标记
-        for (x in 0 until count) {
-            for (y in 0 until count) {
-                if (map[x][y] == FLAG_WAITING_CHECK || map[x][y] > 0) {
-                    map[x][y] = 0
-                }
-            }
-        }
-        //清空检索队列与当前节点
-        nodeQueue.clear()
-        currNode = null
     }
 
     override fun draw(canvas: Canvas) {
@@ -178,11 +172,11 @@ class BreadthFirstSearch : SearchBase(60) {
         }
     }
 
-    private fun getCheckedColor(step: Int): Int {
+    private fun getCheckedColor(g: Int): Int {
         var rate = 0F
         currNode?.let {
-            if (it.step > 0) {
-                rate = step * 1F / it.step
+            if (it.g > 0) {
+                rate = g * 1F / it.g
             }
         }
         val alpha = (192 - 90 * rate).toInt()
@@ -207,15 +201,25 @@ class BreadthFirstSearch : SearchBase(60) {
         val x: Int
         val y: Int
         val parent: Node?
-        var step: Int = 0
+
+        /*起点移动到当前点的代价*/
+        var g = 0F
+        /**
+         * 当前点距离终点的启发式评估代价
+         * 启发值的计算常用的有两种（A->B）
+         * 1、曼哈顿距离：曼哈顿街区出租车的最短行车距离，h = Math.abs(A.x - B.x)+ Math.abs(A.y-B.y)
+         * 2、欧几里得距离：h = Math.sqrt(Math.pow(A.x - B.x)+Math.pow(A.y-B.y))
+         */
+        var h = 0F
 
         constructor(x: Int, y: Int, parent: Node?) {
             this.x = x
             this.y = y
             this.parent = parent
-            if (parent != null) {
-                step = parent.step + 1
-            }
+        }
+
+        fun f(): Float {
+            return g + h
         }
     }
 }

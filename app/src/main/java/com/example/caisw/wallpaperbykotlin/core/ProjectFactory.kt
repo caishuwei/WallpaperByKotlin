@@ -1,10 +1,7 @@
 package com.example.caisw.wallpaperbykotlin.core
 
 import com.example.caisw.wallpaperbykotlin.core.project.IProject
-import com.example.caisw.wallpaperbykotlin.core.project.impl.BFSSearchProject
-import com.example.caisw.wallpaperbykotlin.core.project.impl.BenxiWallpaperProject
-import com.example.caisw.wallpaperbykotlin.core.project.impl.DFSSearchProject
-import com.example.caisw.wallpaperbykotlin.core.project.impl.UCSSearchProject
+import com.example.caisw.wallpaperbykotlin.core.project.impl.*
 import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 
 class ProjectFactory {
@@ -24,6 +21,8 @@ class ProjectFactory {
                 TAG_BFS -> BFSSearchProject(surfaceHolderProvider)
                 TAG_DFS -> DFSSearchProject(surfaceHolderProvider)
                 TAG_UCS -> UCSSearchProject(surfaceHolderProvider)
+                TAG_A_STAR -> AStarSearchProject(surfaceHolderProvider)
+                TAG_IDA_STAR -> UCSSearchProject(surfaceHolderProvider)
                 else -> null
             }
         }
