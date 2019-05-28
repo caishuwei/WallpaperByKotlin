@@ -22,6 +22,13 @@ class MainActivity : BaseActivity() {
                     ProjectDisplayFragment.createArguments(ProjectFactory.TAG_BEN_XI)
             )
         }
+        v_retro_snaker.setOnClickListener {
+            CommonFragmentActivity.openActivity(
+                    this@MainActivity,
+                    ProjectDisplayFragment::class.java,
+                    ProjectDisplayFragment.createArguments(ProjectFactory.TAG_RETRO_SNAKER)
+            )
+        }
         v_bfs.setOnClickListener {
             CommonFragmentActivity.openActivity(
                     this@MainActivity,
