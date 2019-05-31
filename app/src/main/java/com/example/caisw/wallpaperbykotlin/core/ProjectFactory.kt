@@ -8,6 +8,7 @@ class ProjectFactory {
 
     companion object {
         const val TAG_BEN_XI = "本兮壁纸"
+        const val TAG_WALLPAPER = "壁纸"
         const val TAG_RETRO_SNAKER = "贪吃蛇AI"
         const val TAG_BFS = "广度优先搜索"
         const val TAG_DFS = "深度优先搜索"
@@ -19,6 +20,7 @@ class ProjectFactory {
         fun getProject(tag: String, surfaceHolderProvider: SurfaceHolderProvider): IProject? {
             return when (tag) {
                 TAG_BEN_XI -> BenxiWallpaperProject(surfaceHolderProvider)
+                TAG_WALLPAPER -> WallpaperProject(surfaceHolderProvider)
                 TAG_RETRO_SNAKER -> RetroSnakerProject(surfaceHolderProvider)
                 TAG_BFS -> BFSSearchProject(surfaceHolderProvider)
                 TAG_DFS -> DFSSearchProject(surfaceHolderProvider)

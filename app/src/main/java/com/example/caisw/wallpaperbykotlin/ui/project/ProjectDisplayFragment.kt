@@ -1,6 +1,8 @@
 package com.example.caisw.wallpaperbykotlin.ui.project
 
+import android.graphics.PixelFormat
 import android.os.Bundle
+import android.view.SurfaceHolder
 import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
 import com.example.caisw.wallpaperbykotlin.core.project.IProject
@@ -35,6 +37,17 @@ class ProjectDisplayFragment : BaseFragment() {
             }
             return@setOnTouchListener true
         }
+        surfaceView.getSurfaceHolder()?.addCallback(object : SurfaceHolder.Callback {
+            override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
+                project?.onSizeChanged(width, height)
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder?) {
+            }
+
+            override fun surfaceCreated(holder: SurfaceHolder?) {
+            }
+        })
     }
 
     override fun initData() {

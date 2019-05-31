@@ -19,14 +19,22 @@ import java.util.concurrent.CopyOnWriteArrayList
 /**
  * Created by caisw on 2018/3/12.
  */
-class SurfaceDrawController(private val surfaceHolderProvider: SurfaceHolderProvider) : IDrawController {
+class SurfaceDrawController : IDrawController {
 
     val spiritHolder: SpiritHolder
-
     private var drawDisposable: Disposable? = null
+    private var surfaceHolderProvider: SurfaceHolderProvider
+    var clearCanvasBeforeDrawSpirit: Boolean = true
 
     init {
         spiritHolder = SpiritHolder()
+    }
+
+    constructor(surfaceHolderProvider: SurfaceHolderProvider) : this(surfaceHolderProvider, true)
+
+    constructor(surfaceHolderProvider: SurfaceHolderProvider, clearCanvasBeforeDrawSpirit: Boolean) {
+        this.surfaceHolderProvider = surfaceHolderProvider
+        this.clearCanvasBeforeDrawSpirit = clearCanvasBeforeDrawSpirit
     }
 
     override fun startDraw() {
@@ -90,7 +98,9 @@ class SurfaceDrawController(private val surfaceHolderProvider: SurfaceHolderProv
     private val dirtyRect = Rect()
 
     private fun onDraw(canvas: Canvas) {
-        canvas.drawARGB(255, 0, 0, 0)//清屏
+        if (clearCanvasBeforeDrawSpirit) {
+            canvas.drawARGB(255, 0, 0, 0)//清屏
+        }
         canvas.save()
 //        dirtyRect.set(0, 0, 0, 0)
         val iterator = spiritHolder.spiritList.iterator()

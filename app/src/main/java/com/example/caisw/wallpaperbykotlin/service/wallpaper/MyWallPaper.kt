@@ -62,6 +62,7 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onSurfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
             super.onSurfaceChanged(holder, format, width, height)
+            project?.onSizeChanged(width, height)
         }
 
         /**

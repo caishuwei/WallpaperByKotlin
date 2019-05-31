@@ -22,6 +22,13 @@ class MainActivity : BaseActivity() {
                     ProjectDisplayFragment.createArguments(ProjectFactory.TAG_BEN_XI)
             )
         }
+        v_wallpaper.setOnClickListener {
+            CommonFragmentActivity.openActivity(
+                    this@MainActivity,
+                    ProjectDisplayFragment::class.java,
+                    ProjectDisplayFragment.createArguments(ProjectFactory.TAG_WALLPAPER)
+            )
+        }
         v_retro_snaker.setOnClickListener {
             CommonFragmentActivity.openActivity(
                     this@MainActivity,

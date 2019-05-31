@@ -9,7 +9,7 @@ import com.example.caisw.wallpaperbykotlin.core.spirit.SpiritGroup
  * <br/>
  * 实现场景偏移与缩放
  */
-class Scene : SpiritGroup() {
+open class Scene : SpiritGroup() {
 
     private val matrix = Matrix()
 
