@@ -23,7 +23,7 @@ class MyWallPaper : WallpaperService() {
      */
     inner class MyEngine : Engine(), SurfaceHolderProvider {
 
-        private var project = ProjectFactory.getProject(ProjectFactory.TAG_BEN_XI, this)
+        private var project = ProjectFactory.getProject(ProjectFactory.TAG_WALLPAPER, this)
 
         /**
          * 引擎创建后调用的方法，接收一个SurfaceHolder<br/>

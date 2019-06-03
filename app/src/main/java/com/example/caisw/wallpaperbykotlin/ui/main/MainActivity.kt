@@ -1,5 +1,8 @@
 package com.example.caisw.wallpaperbykotlin.ui.main
 
+import android.app.AlertDialog
+import android.app.WallpaperManager
+import android.content.Intent
 import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
 import com.example.caisw.wallpaperbykotlin.ui.base.BaseActivity
@@ -65,7 +68,19 @@ class MainActivity : BaseActivity() {
             )
         }
         v_ida.setOnClickListener {
-
+            AlertDialog.Builder(this)
+                    .setTitle("前往设置壁纸")
+                    .setNegativeButton("确认") { _, _ ->
+                        var intent = Intent(WallpaperManager.ACTION_LIVE_WALLPAPER_CHOOSER);
+                        startActivity(intent)
+                    }
+                    .setPositiveButton("退出") { _, _ ->
+                        super.onBackPressed()
+                    }
+                    .setOnCancelListener { _ ->
+                        super.onBackPressed()
+                    }
+                    .create().show()
         }
     }
 
