@@ -1,5 +1,6 @@
 package com.example.caisw.wallpaperbykotlin.core.project.impl
 
+import android.util.Log
 import android.view.MotionEvent
 import com.example.caisw.wallpaperbykotlin.core.draw.impl.SurfaceDrawController
 import com.example.caisw.wallpaperbykotlin.core.project.IProject

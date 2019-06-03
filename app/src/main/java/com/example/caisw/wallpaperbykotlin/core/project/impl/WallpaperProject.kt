@@ -14,7 +14,7 @@ class WallpaperProject(surfaceHolderProvider: SurfaceHolderProvider) : BaseProje
 //        drawController.clearCanvasBeforeDrawSpirit = false
         spiritHolder.addSpirit(wallpaper)
         spiritHolder.addSpirit(touchLine)
-        spiritHolder.addSpirit(Frame())
+//        spiritHolder.addSpirit(Frame())
     }
 
     override fun onCreate() {

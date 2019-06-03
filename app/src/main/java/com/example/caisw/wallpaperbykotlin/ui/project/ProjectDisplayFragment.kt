@@ -9,7 +9,7 @@ import com.example.caisw.wallpaperbykotlin.core.project.IProject
 import com.example.caisw.wallpaperbykotlin.ui.base.BaseFragment
 import kotlinx.android.synthetic.main.fragment_project_display.*
 
-class ProjectDisplayFragment : BaseFragment() {
+open class ProjectDisplayFragment : BaseFragment() {
 
     companion object {
 

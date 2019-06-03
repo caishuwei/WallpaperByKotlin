@@ -1,6 +1,7 @@
 package com.example.caisw.wallpaperbykotlin.service.wallpaper
 
 import android.service.wallpaper.WallpaperService
+import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
@@ -70,6 +71,7 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
             super.onSurfaceDestroyed(holder)
+            Log.e("Engine","onSurfaceDestroyed")
             project?.onPause()
         }
 
