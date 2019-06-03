@@ -20,7 +20,7 @@ abstract class BaseProject(val surfaceHolderProvider: SurfaceHolderProvider) : I
     }
 
     override fun onPause() {
-        drawController.startDraw()
+        drawController.stopDraw()
     }
 
     override fun onDestroy() {

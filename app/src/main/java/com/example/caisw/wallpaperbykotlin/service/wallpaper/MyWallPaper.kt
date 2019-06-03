@@ -71,7 +71,6 @@ class MyWallPaper : WallpaperService() {
          */
         override fun onSurfaceDestroyed(holder: SurfaceHolder?) {
             super.onSurfaceDestroyed(holder)
-            Log.e("Engine","onSurfaceDestroyed")
             project?.onPause()
         }
 
