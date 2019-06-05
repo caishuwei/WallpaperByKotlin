@@ -2,8 +2,6 @@ package com.example.caisw.wallpaperbykotlin.core.spirit.snaker
 
 import android.content.res.Resources
 import android.graphics.*
-import android.widget.Toast
-import com.example.caisw.wallpaperbykotlin.app.MyApplication
 import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 import io.reactivex.Observable
@@ -29,7 +27,7 @@ class RetroSnaker : Spirit() {
     init {
         val wSize = ScreenInfo.WIDTH.toFloat()
         val hSize = ScreenInfo.HEIGHT.toFloat()
-        val unitSize = ScreenInfo.dp2px(20f)//预估一个方块的大小
+        val unitSize = ScreenInfo.dp2px(60f)//预估一个方块的大小
         wNum = (wSize / unitSize).toInt()//横向方块数量
         hNum = (hSize / unitSize).toInt()//纵向方块数量
         //求得每个方块的区域
@@ -97,7 +95,7 @@ class RetroSnaker : Spirit() {
                 var endDrawTime: Long
                 try {
                     it.onNext(findNextStep())
-                    Thread.sleep(500)
+                    Thread.sleep(20)
                 } catch (e: Exception) {
                     if (!it.isDisposed) {
                         it.onError(e)
@@ -120,7 +118,7 @@ class RetroSnaker : Spirit() {
                             updateSnakerPath()
                         },
                         {
-                            Toast.makeText(MyApplication.instance, it.message, Toast.LENGTH_SHORT).show()
+                            //                            Toast.makeText(MyApplication.instance, it.message, Toast.LENGTH_SHORT).show()
                         }
                 )
     }
@@ -130,47 +128,104 @@ class RetroSnaker : Spirit() {
         //建立地图单位数组
         val unitArray = Array<IntArray>(wNum) { IntArray(hNum) }
         //赋值蛇的单位为1
-        val iterator = snaker.iterator()
+        var iterator = snaker.iterator()
         var point: Point
         while (iterator.hasNext()) {
             point = iterator.next()
             unitArray[point.x][point.y] = 1
         }
-        //从起点开始A*搜索到终点的路径
+        //查询吃食物的路径
         val nodeList = LinkedList<Node>()
-        val snakerHead = snaker.peekLast()
+        var snakerHead = snaker.peekLast()
+        var snakerEnd = snaker.peek()
         nodeList.offer(Node(snakerHead.x, snakerHead.y, null))
-        var result: Point?
+        var eatResult: Node?
         do {
-            result = aStartSearch(nodeList, unitArray)
-        } while (result == null && !nodeList.isEmpty())
-        if (result == null) {
-            throw Resources.NotFoundException("无路可走")
+            eatResult = aStartSearch(nodeList, fruit, unitArray, 2)
+        } while (eatResult == null && !nodeList.isEmpty())
+        //查询跟随蛇尾的路径
+        nodeList.clear()
+        nodeList.offer(Node(snakerHead.x, snakerHead.y, null))
+        unitArray[snakerEnd.x][snakerEnd.y] = 0//设置蛇尾可寻找
+        var followResult: Node?
+        do {
+            followResult = aStartSearch(nodeList, snaker.peek(), unitArray, 3)
+        } while (followResult == null && !nodeList.isEmpty())
+        //找到吃果实的路径，要保证吃完果实可以走到蛇尾，这样才不会是死路
+        if (eatResult != null) {
+            val newSnaker = LinkedList<Point>()
+            val newSnakerSize = snaker.size + 1
+            var currSize = 0;
+            var node: Node = eatResult
+            var parent: Node? = node.parent
+            while (parent != null && currSize < newSnakerSize) {
+                newSnaker.addFirst(Point(node.x, node.y))
+                node = parent
+                parent = node.parent
+                currSize++
+            }
+            if (currSize < newSnakerSize) {
+                newSnaker.addAll(0, snaker.subList(snaker.size - (newSnakerSize - currSize), snaker.size))
+            }
+            //更新一下地图单位
+            for (w in 0 until wNum) {
+                for (h in 0 until hNum) {
+                    unitArray[w][h] = 0
+                }
+            }
+            iterator = newSnaker.iterator()
+            while (iterator.hasNext()) {
+                point = iterator.next()
+                unitArray[point.x][point.y] = 1
+            }
+            //添加蛇头到查询队列
+            snakerHead = newSnaker.peekLast()
+            nodeList.clear()
+            nodeList.offer(Node(snakerHead.x, snakerHead.y, null))
+            snakerEnd = newSnaker.peek()
+            unitArray[snakerEnd.x][snakerEnd.y] = 0//设置蛇尾可寻找
+            var checkResult: Node?
+            do {
+                checkResult = aStartSearch(nodeList, snakerEnd, unitArray, 3)
+            } while (checkResult == null && !nodeList.isEmpty())
+            if (checkResult == null) {
+                //吃完食物无法找到前往蛇尾的路径,那么不能去吃
+                eatResult = null
+            }
+        }
+        if (eatResult == null) {
+            if (followResult == null) {
+                throw Resources.NotFoundException("无路可走")
+            } else {
+                return readNextPoint(followResult)
+            }
         } else {
-            return result
+            return readNextPoint(eatResult)
         }
     }
 
-    private fun aStartSearch(nodeList: LinkedList<Node>, unitArray: Array<IntArray>): Point? {
-        var node = nodeList.poll()
-        if (node.equals(fruit)) {
-            //已经找到终点，返回下一步要走的点
-            var parent: Node?
-            while (true) {
-                parent = node.parent
-                if (parent != null) {
-                    if (parent.parent == null) {//父节点是开始节点
-                        return node//返回这个节点
-                    } else {
-                        node = parent
-                    }
-                } else {
-                    return null
-                }
+    private fun readNextPoint(node: Node): Point {
+        var curr = node
+        var parent: Node?
+        do {
+            parent = curr.parent
+            if (parent == null) {
+                return curr
+            } else if (parent.parent == null) {
+                return curr
+            } else {
+                curr = parent
             }
+        } while (true)
+    }
+
+    private fun aStartSearch(nodeList: LinkedList<Node>, dest: Point, unitArray: Array<IntArray>, flag: Int): Node? {
+        val node = nodeList.poll()
+        if (node == dest) {
+            return node
         } else {
             //不是终点,搜寻附近点加入队列
-            insertNearNodes(nodeList, unitArray, node)
+            insertNearNodes(nodeList, unitArray, node, dest, flag)
         }
         return null
     }
@@ -178,23 +233,23 @@ class RetroSnaker : Spirit() {
     /**
      * 插入附近节点到队列
      */
-    private fun insertNearNodes(nodeList: LinkedList<Node>, unitArray: Array<IntArray>, node: Node) {
+    private fun insertNearNodes(nodeList: LinkedList<Node>, unitArray: Array<IntArray>, node: Node, dest: Point, flag: Int) {
         //左
-        var nearNode = getNodeIfEnable(node.x - 1, node.y, node, unitArray)
+        var nearNode = getNodeIfEnable(node.x - 1, node.y, node, unitArray, flag)
         if (nearNode != null) {
-            insertToLinkList(nodeList, nearNode)
+            insertToLinkList(nodeList, nearNode, dest)
         }
-        nearNode = getNodeIfEnable(node.x, node.y - 1, node, unitArray)
+        nearNode = getNodeIfEnable(node.x, node.y - 1, node, unitArray, flag)
         if (nearNode != null) {
-            insertToLinkList(nodeList, nearNode)
+            insertToLinkList(nodeList, nearNode, dest)
         }
-        nearNode = getNodeIfEnable(node.x + 1, node.y, node, unitArray)
+        nearNode = getNodeIfEnable(node.x + 1, node.y, node, unitArray, flag)
         if (nearNode != null) {
-            insertToLinkList(nodeList, nearNode)
+            insertToLinkList(nodeList, nearNode, dest)
         }
-        nearNode = getNodeIfEnable(node.x, node.y + 1, node, unitArray)
+        nearNode = getNodeIfEnable(node.x, node.y + 1, node, unitArray, flag)
         if (nearNode != null) {
-            insertToLinkList(nodeList, nearNode)
+            insertToLinkList(nodeList, nearNode, dest)
         }
     }
 
@@ -202,14 +257,14 @@ class RetroSnaker : Spirit() {
     /**
      * 将节点插入队列
      */
-    private fun insertToLinkList(nodeList: LinkedList<Node>, nearNode: Node) {
+    private fun insertToLinkList(nodeList: LinkedList<Node>, nearNode: Node, dest: Point) {
         //计算代价
         val parent = nearNode.parent
         parent?.let {
             nearNode.g = it.g + 1
         }
         //使用曼哈顿距离，计算与终点的距离
-        nearNode.h = (Math.abs(nearNode.x - fruit.x) + Math.abs(nearNode.y - fruit.y)).toFloat()
+        nearNode.h = (Math.abs(nearNode.x - dest.x) + Math.abs(nearNode.y - dest.y)).toFloat()
         //欧几里得距离
 //        nearNode.h = Math.sqrt(Math.pow((nearNode.x - endPoint.x).toDouble(), 2.0) + Math.pow((nearNode.y - endPoint.y).toDouble(), 2.0)).toFloat()
         //按代价大小插入队列
@@ -227,11 +282,11 @@ class RetroSnaker : Spirit() {
     /**
      * 如果该坐标节点可用则返回
      */
-    private fun getNodeIfEnable(x: Int, y: Int, parent: Node?, unitArray: Array<IntArray>): Node? {
+    private fun getNodeIfEnable(x: Int, y: Int, parent: Node?, unitArray: Array<IntArray>, flag: Int): Node? {
         if (x in 0 until wNum
                 && y in 0 until hNum) {
-            if (unitArray[x][y] == 0) {
-                unitArray[x][y] == 2//2为已经搜索过的点
+            if (unitArray[x][y] != 1 && unitArray[x][y] != flag) {
+                unitArray[x][y] = flag//2为已经搜索过的点
                 return Node(x, y, parent)
             }
         }
@@ -294,6 +349,13 @@ class RetroSnaker : Spirit() {
 
         fun f(): Float {
             return g + h
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (other is Point) {
+                return this.x == other.x && this.y == other.y
+            }
+            return false
         }
     }
 
