@@ -143,5 +143,7 @@ ext {
             //本地大图加载框架，不会直接加载一整张图片，而是根据屏幕显示的区域对图片进行分块加载
             largeImageView               : "com.shizhefei:LargeImageView:1.1.0",
 
+            //腾讯bugly https://bugly.qq.com/docs/user-guide/instruction-manual-android/?v=20190418140644
+            bugly                        : 'com.tencent.bugly:crashreport:latest.release'
     ]
 }

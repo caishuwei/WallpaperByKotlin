@@ -46,6 +46,7 @@ dependencies {
     implementation rootProject.ext.others.rxpermissions
     implementation rootProject.ext.others.BaseRecyclerViewAdapterHelper
     implementation rootProject.ext.kotlin.kotlin_stdlib_jdk8
+    implementation rootProject.ext.others.bugly
 }
 repositories {
     mavenCentral()

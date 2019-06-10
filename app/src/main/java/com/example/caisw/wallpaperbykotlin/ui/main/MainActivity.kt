@@ -6,6 +6,7 @@ import com.example.caisw.wallpaperbykotlin.ui.base.BaseActivity
 import com.example.caisw.wallpaperbykotlin.ui.base.CommonFragmentActivity
 import com.example.caisw.wallpaperbykotlin.ui.project.ProjectDisplayFragment
 import com.example.caisw.wallpaperbykotlin.ui.project.WallpaperProjectDisplayFragment
+import com.tencent.bugly.crashreport.CrashReport
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
@@ -66,7 +67,6 @@ class MainActivity : BaseActivity() {
             )
         }
         v_ida.setOnClickListener {
-
         }
     }
 
