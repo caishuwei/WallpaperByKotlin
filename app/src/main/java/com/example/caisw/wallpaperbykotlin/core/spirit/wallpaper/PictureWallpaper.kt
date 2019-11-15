@@ -11,7 +11,7 @@ import com.example.caisw.wallpaperbykotlin.core.spirit.SpiritGroup
 import com.example.caisw.wallpaperbykotlin.utils.MatrixUtils
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 
-class Wallpaper : SpiritGroup() {
+class PictureWallpaper : SpiritGroup() {
     private val bitmapMatrix = Matrix()
     private val bitmap: Bitmap
     private val bitmapRectF = RectF()//图片的大小
@@ -26,8 +26,28 @@ class Wallpaper : SpiritGroup() {
     init {
         visibleRectF = RectF(0f, 0f, ScreenInfo.WIDTH.toFloat(), ScreenInfo.HEIGHT.toFloat())
         //直接载入图片
-//        bitmap = BitmapFactory.decodeResource(MyApplication.instance.resources, R.drawable.yudi)
-        //加载图片的一部分区域(waiting这张图是比较宽，我想要切出人物的那一块做壁纸)
+        bitmap = BitmapFactory.decodeResource(MyApplication.instance.resources, R.raw.hate)
+//        bitmap = readWaiting()
+//        bitmap = readKing()
+
+        bitmapRectF.set(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat())
+        scaledTouchSlop = ViewConfiguration.get(MyApplication.instance).scaledTouchSlop.toFloat()
+    }
+
+    private fun readKing(): Bitmap {
+        val brd = BitmapRegionDecoder.newInstance(MyApplication.instance.resources.openRawResource(R.raw.king), false)
+        val length = Math.min(brd.width, brd.height)
+        val rect = Rect(
+                0,
+                0,
+                brd.width,
+                Math.min(brd.height, (brd.width / visibleRectF.width() * visibleRectF.height()).toInt())
+        )
+        return brd.decodeRegion(rect, BitmapFactory.Options())
+    }
+
+    private fun readWaiting(): Bitmap {
+        //            //加载图片的一部分区域(waiting这张图是比较宽，我想要切出人物的那一块做壁纸)
         val brd = BitmapRegionDecoder.newInstance(MyApplication.instance.resources.openRawResource(R.raw.waiting), false)
         val length = Math.min(brd.width, brd.height)
         val rect = Rect(
@@ -38,10 +58,7 @@ class Wallpaper : SpiritGroup() {
         )
         //再去掉左边的1/4就差不多了
         rect.set(rect.left + length / 4, rect.top, rect.right, rect.bottom)
-        bitmap = brd.decodeRegion(rect, BitmapFactory.Options())
-
-        bitmapRectF.set(0F, 0F, bitmap.width.toFloat(), bitmap.height.toFloat())
-        scaledTouchSlop = ViewConfiguration.get(MyApplication.instance).scaledTouchSlop.toFloat()
+        return brd.decodeRegion(rect, BitmapFactory.Options())
     }
 
     override fun draw(canvas: Canvas) {
@@ -114,7 +131,7 @@ class Wallpaper : SpiritGroup() {
                 visibleRectF,
                 ImageView.ScaleType.CENTER_CROP
         )
-        //再放大1.1倍
+        //再放大1.2倍
         bitmapMatrix.postScale(1.2f, 1.2f, visibleRectF.centerX(), visibleRectF.centerY())
         //获取图片变换后的实际区域
         bitmapMatrix.mapRect(pictureRectF, bitmapRectF)

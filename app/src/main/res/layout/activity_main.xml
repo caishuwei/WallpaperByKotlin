@@ -25,13 +25,23 @@
                 android:textColor="@color/black" />
 
             <TextView
+                android:id="@+id/v_game_of_life_wallpaper"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="10dp"
+                android:background="@color/white"
+                android:gravity="center"
+                android:text="康威生命游戏_壁纸"
+                android:textColor="@color/black" />
+
+            <TextView
                 android:id="@+id/v_wallpaper"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="10dp"
                 android:background="@color/white"
                 android:gravity="center"
-                android:text="壁纸"
+                android:text="图片_壁纸"
                 android:textColor="@color/black" />
 
             <TextView

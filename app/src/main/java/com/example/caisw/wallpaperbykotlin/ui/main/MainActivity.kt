@@ -4,9 +4,9 @@ import com.example.caisw.wallpaperbykotlin.R
 import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
 import com.example.caisw.wallpaperbykotlin.ui.base.BaseActivity
 import com.example.caisw.wallpaperbykotlin.ui.base.CommonFragmentActivity
+import com.example.caisw.wallpaperbykotlin.ui.project.LifeGameWallPaperProjectDisplayFragment
 import com.example.caisw.wallpaperbykotlin.ui.project.ProjectDisplayFragment
 import com.example.caisw.wallpaperbykotlin.ui.project.WallpaperProjectDisplayFragment
-import com.tencent.bugly.crashreport.CrashReport
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : BaseActivity() {
@@ -22,6 +22,13 @@ class MainActivity : BaseActivity() {
                     this@MainActivity,
                     ProjectDisplayFragment::class.java,
                     ProjectDisplayFragment.createArguments(ProjectFactory.TAG_BEN_XI)
+            )
+        }
+        v_game_of_life_wallpaper.setOnClickListener {
+            CommonFragmentActivity.openActivity(
+                    this@MainActivity,
+                    LifeGameWallPaperProjectDisplayFragment::class.java,
+                    LifeGameWallPaperProjectDisplayFragment.createArguments()
             )
         }
         v_wallpaper.setOnClickListener {

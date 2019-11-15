@@ -2,13 +2,12 @@ package com.example.caisw.wallpaperbykotlin.core.project.impl
 
 import android.view.MotionEvent
 import com.example.caisw.wallpaperbykotlin.core.spirit.group.TouchLine
-import com.example.caisw.wallpaperbykotlin.core.spirit.impl.Frame
-import com.example.caisw.wallpaperbykotlin.core.spirit.wallpaper.Wallpaper
+import com.example.caisw.wallpaperbykotlin.core.spirit.lifegame.LifeGameWallPaper
 import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 
-class WallpaperProject(surfaceHolderProvider: SurfaceHolderProvider) : BaseProject(surfaceHolderProvider) {
+class LifeGameWallpaperProject(surfaceHolderProvider: SurfaceHolderProvider) : BaseProject(surfaceHolderProvider) {
     private var touchLine = TouchLine()
-    private var wallpaper = Wallpaper()
+    private var wallpaper = LifeGameWallPaper()
 
     init {
 //        drawController.clearCanvasBeforeDrawSpirit = false
@@ -23,6 +22,11 @@ class WallpaperProject(surfaceHolderProvider: SurfaceHolderProvider) : BaseProje
             val surfaceRect = it.surfaceFrame
             wallpaper.setVisibleRectF(0F, 0F, surfaceRect.right.toFloat(), surfaceRect.bottom.toFloat());
         }
+    }
+
+    override fun onDestroy() {
+        wallpaper.stopEvolve()
+        super.onDestroy()
     }
 
     override fun onSizeChanged(width: Int, height: Int) {

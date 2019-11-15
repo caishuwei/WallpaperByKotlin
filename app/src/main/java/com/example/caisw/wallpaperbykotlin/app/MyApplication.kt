@@ -19,7 +19,6 @@ class MyApplication : Application() {
     companion object {
         /**应用实例*/
         lateinit var instance: MyApplication
-
     }
 
     override fun onCreate() {
@@ -27,6 +26,8 @@ class MyApplication : Application() {
         MyApplication.instance = this
         initBuglyInMainProcess()
     }
+
+    val spDataCache = SPDataCache(this)
 
     private fun initBuglyInMainProcess() {
 //        val packageName = packageName

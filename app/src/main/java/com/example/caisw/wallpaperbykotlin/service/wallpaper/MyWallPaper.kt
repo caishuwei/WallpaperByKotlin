@@ -1,9 +1,9 @@
 package com.example.caisw.wallpaperbykotlin.service.wallpaper
 
 import android.service.wallpaper.WallpaperService
-import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import com.example.caisw.wallpaperbykotlin.app.MyApplication
 import com.example.caisw.wallpaperbykotlin.core.ProjectFactory
 import com.example.caisw.wallpaperbykotlin.core.surface.SurfaceHolderProvider
 
@@ -24,7 +24,7 @@ class MyWallPaper : WallpaperService() {
      */
     inner class MyEngine : Engine(), SurfaceHolderProvider {
 
-        private var project = ProjectFactory.getProject(ProjectFactory.TAG_WALLPAPER, this)
+        private var project = ProjectFactory.getProject(MyApplication.instance.spDataCache.common.getWallPaperType(), this)
 
         /**
          * 引擎创建后调用的方法，接收一个SurfaceHolder<br/>
