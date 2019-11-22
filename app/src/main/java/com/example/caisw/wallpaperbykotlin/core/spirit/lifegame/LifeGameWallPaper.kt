@@ -9,6 +9,8 @@ import android.view.MotionEvent
 import com.example.caisw.wallpaperbykotlin.core.spirit.Spirit
 import com.example.caisw.wallpaperbykotlin.utils.ScreenInfo
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.collections.ArrayList
 
 class LifeGameWallPaper : Spirit() {
@@ -16,16 +18,14 @@ class LifeGameWallPaper : Spirit() {
     private val data = Data()
 
     init {
-//        var cell: Cell? = null
-//        for (x in 0..1) {
-//            for (y in 0..1) {
-//                cell = data.getCell(x, y, true)
-//                cell?.let {
-//                    it.setAlive(true)
-//                    data.onCellAliveUpdate(it)
-//                }
-//            }
-//        }
+        var cell: Cell? = null
+        for (x in 50 until 60) {
+            cell = data.getCell(x, data.maxHeight / 2, true)
+            cell?.let {
+                it.setAlive(true)
+                data.onCellAliveUpdate(it)
+            }
+        }
         startEvolve()
     }
 
@@ -40,17 +40,17 @@ class LifeGameWallPaper : Spirit() {
     fun onTouchEvent(event: MotionEvent) {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                stopEvolve()
+//                stopEvolve()
             }
             MotionEvent.ACTION_MOVE -> {
-                val cell = data.getCell(event.x.toInt(), event.y.toInt(), true)
-                cell?.let {
-                    it.setAlive(true)
-                    data.onCellAliveUpdate(it)
-                }
+//                val cell = data.getCell(event.x.toInt(), event.y.toInt(), true)
+//                cell?.let {
+//                    it.setAlive(true)
+//                    data.onCellAliveUpdate(it)
+//                }
             }
             MotionEvent.ACTION_CANCEL, MotionEvent.ACTION_UP -> {
-                startEvolve()
+//                startEvolve()
             }
         }
     }
@@ -74,10 +74,10 @@ class LifeGameWallPaper : Spirit() {
 
     private inner class Data() {
         val cellColor: Int = Color.WHITE
-        val minWidth = 30
-        val minHeight = 30
-        val maxWidth = 200
-        val maxHeight = 200
+        val minWidth = 10000
+        val minHeight = 10000
+        val maxWidth = minWidth
+        val maxHeight = minHeight
         val visibleRectF = RectF(
                 0f,
                 0f,
@@ -89,7 +89,9 @@ class LifeGameWallPaper : Spirit() {
         private var bitmapMatrix = Matrix()
         private val cacheCellMap = HashMap<Point, Cell>()
         private val aliveCellMap = HashMap<Point, Cell>()
-        val evolveTime: Long = 200
+        val evolveTime: Long = 0//演变间隔时间
+        val threadCalcNum = 1000//每个线程计算多少个细胞
+
 
         fun getCell(x: Int, y: Int, createIfIsNull: Boolean = false): Cell? {
             val cell = cacheCellMap[Point(x, y)]
@@ -116,7 +118,7 @@ class LifeGameWallPaper : Spirit() {
             }
         }
 
-        fun getAliveCells(): MutableCollection<Cell> {
+        fun getAliveCells(): ArrayList<Cell> {
             val values = aliveCellMap.values
             val copy = ArrayList<Cell>()
             copy.addAll(values)
@@ -157,7 +159,6 @@ class LifeGameWallPaper : Spirit() {
             //图片要居中到屏幕，不管宽高是放大还是缩小，我们都最小缩放值
             val scale = Math.min(scaleX, scaleY)
             bitmapMatrix.reset()
-//            bitmapMatrix.postScale(10f, 10f)//先缩放
             bitmapMatrix.postScale(scale, scale)//先缩放
             bitmapMatrix.postTranslate((containerW - bitmapW * scale) / 2, (containerH - bitmapH * scale) / 2)//再偏移
             return bitmapMatrix
@@ -261,11 +262,13 @@ class LifeGameWallPaper : Spirit() {
         }
     }
 
+
     private inner class SubThreadHandler(val myHandlerThread: MyHandlerThread = MyHandlerThread()) : Handler(myHandlerThread.looper) {
         var destroyed = false
         val msgWhatDestroy = -1
         val msgWhatExecuteEvolve = 1
-
+        val threadExecuteCount = AtomicInteger(0)
+        val threadPoolExecutor = Executors.newCachedThreadPool()
         override fun handleMessage(msg: Message?) {
             super.handleMessage(msg)
             if (msg == null) {
@@ -280,51 +283,51 @@ class LifeGameWallPaper : Spirit() {
                     val aliveCells = data.getAliveCells()
                     val evolveTime = System.currentTimeMillis()
                     val aliveRange = Rect()
-                    var aliveCount = 0
-                    for (cell in aliveCells) {
-                        //将该cell周围包括自身9个细胞全部演变一次
-                        for (x in -1..1) {
-                            for (y in -1..1) {
-                                cell.getCell(x, y, true)?.let {
-                                    if (it.executeEvolve(evolveTime)) {
-                                        aliveCount++;
-                                        updateAliveRange(aliveRange, it.x, it.y)
-                                    }
-                                }
-                            }
+                    val aliveCount = aliveCells.size
+                    val bitmap = Bitmap.createBitmap(data.minWidth, data.minHeight, Bitmap.Config.ARGB_8888)
+                    if (aliveCount > 0) {
+                        Log.i(this@LifeGameWallPaper::class.java.name, "aliveCount = $aliveCount")
+                        for (i in 0..aliveCount / data.threadCalcNum) {
+                            threadExecuteCount.incrementAndGet()
+                            threadPoolExecutor.submit(MyCalcRunnable(evolveTime, bitmap, aliveCells.subList(data.threadCalcNum * i, Math.min(aliveCount, data.threadCalcNum * (i + 1))), aliveRange))
+                        }
+                        while (threadExecuteCount.get() > 0) {
+                            //循环至所有计算线程结束
+                            Thread.sleep(5)
                         }
                     }
-                    Log.i(this@LifeGameWallPaper::class.java.name, "aliveCount:$aliveCount")
+                    data.updateBimmap(bitmap)
+
                     //区域校正
-                    if (aliveRange.width() < data.minWidth) {
-                        val centerX = aliveRange.centerX()
-                        aliveRange.left = centerX - data.minWidth / 2
-                        aliveRange.right = centerX + data.minWidth / 2
-                    } else if (aliveRange.width() > data.maxWidth) {
-                        val centerX = aliveRange.centerX()
-                        aliveRange.left = centerX - data.maxWidth / 2
-                        aliveRange.right = centerX + data.maxWidth / 2
-                    }
-                    if (aliveRange.height() < data.minHeight) {
-                        val centerY = aliveRange.centerY()
-                        aliveRange.top = centerY - data.minHeight / 2
-                        aliveRange.bottom = centerY + data.minHeight / 2
-                    } else if (aliveRange.height() > data.maxHeight) {
-                        val centerY = aliveRange.centerY()
-                        aliveRange.top = centerY - data.maxHeight / 2
-                        aliveRange.bottom = centerY + data.maxHeight / 2
-                    }
+//                    if (aliveRange.width() < data.minWidth) {
+//                        val centerX = aliveRange.centerX()
+//                        aliveRange.left = centerX - data.minWidth / 2
+//                        aliveRange.right = centerX + data.minWidth / 2
+//                    } else if (aliveRange.width() > data.maxWidth) {
+//                        val centerX = aliveRange.centerX()
+//                        aliveRange.left = centerX - data.maxWidth / 2
+//                        aliveRange.right = centerX + data.maxWidth / 2
+//                    }
+//                    if (aliveRange.height() < data.minHeight) {
+//                        val centerY = aliveRange.centerY()
+//                        aliveRange.top = centerY - data.minHeight / 2
+//                        aliveRange.bottom = centerY + data.minHeight / 2
+//                    } else if (aliveRange.height() > data.maxHeight) {
+//                        val centerY = aliveRange.centerY()
+//                        aliveRange.top = centerY - data.maxHeight / 2
+//                        aliveRange.bottom = centerY + data.maxHeight / 2
+//                    }
                     //绘图
-                    if (!aliveRange.isEmpty) {
-                        val bitmap = Bitmap.createBitmap(aliveRange.width(), aliveRange.height(), Bitmap.Config.ARGB_8888)
-                        val aliveCells2 = data.getAliveCells()
-                        for (cell in aliveCells2) {
-                            if (aliveRange.contains(cell.x, cell.y)) {
-                                bitmap.setPixel(cell.x - aliveRange.left, cell.y - aliveRange.top, data.cellColor)
-                            }
-                        }
-                        data.updateBimmap(bitmap)
-                    }
+//                    if (!aliveRange.isEmpty) {
+//                        val bitmap = Bitmap.createBitmap(aliveRange.width(), aliveRange.height(), Bitmap.Config.ARGB_8888)
+//                        val aliveCells2 = data.getAliveCells()
+//                        for (cell in aliveCells2) {
+//                            if (aliveRange.contains(cell.x, cell.y)) {
+//                                bitmap.setPixel(cell.x - aliveRange.left, cell.y - aliveRange.top, data.cellColor)
+//                            }
+//                        }
+//                        data.updateBimmap(bitmap)
+//                    }
                     //进行下一次演变
                     if (!destroyed) {
                         sendEmptyMessageDelayed(msgWhatExecuteEvolve, data.evolveTime)
@@ -364,7 +367,32 @@ class LifeGameWallPaper : Spirit() {
             Message.obtain(this, msgWhatExecuteEvolve).sendToTarget()
         }
 
+        private inner class MyCalcRunnable(val evolveTime: Long, val bitmap: Bitmap, val aliveCells: List<Cell>, val aliveRange: Rect) : Runnable {
+
+            override fun run() {
+                for (cell in aliveCells) {
+                    //将该cell周围包括自身9个细胞全部演变一次
+                    for (x in -1..1) {
+                        for (y in -1..1) {
+                            cell.getCell(x, y, true)?.let {
+                                if (it.executeEvolve(evolveTime)) {
+                                    updateAliveRange(aliveRange, it.x, it.y)
+                                    if (it.x >= 0
+                                            && it.x < bitmap.width
+                                            && it.y >= 0
+                                            && it.y < bitmap.height) {
+                                        bitmap.setPixel(it.x, it.y, data.cellColor)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                threadExecuteCount.decrementAndGet()
+            }
+        }
     }
+
 
     private inner class MyHandlerThread : HandlerThread("生命游戏演变处理线程") {
 
@@ -374,6 +402,7 @@ class LifeGameWallPaper : Spirit() {
         }
 
     }
+
 
 }
 

@@ -34,8 +34,8 @@ class MyApplication : Application() {
 //        val processName = getCurrProcessName(Process.myPid())
 //        val userStrategy = CrashReport.UserStrategy(this)
 //        userStrategy.isUploadProcess = processName == null || processName.equals(packageName)
-//        CrashReport.initCrashReport(this, "d736acce99", BuildConfig.DEBUG, userStrategy)
-        CrashReport.initCrashReport(this, "d736acce99", BuildConfig.DEBUG)
+//        CrashReport.initCrashReport(this, "1a0141a1ce", BuildConfig.DEBUG, userStrategy)
+        CrashReport.initCrashReport(this, "1a0141a1ce", BuildConfig.DEBUG)
     }
 
     /**
