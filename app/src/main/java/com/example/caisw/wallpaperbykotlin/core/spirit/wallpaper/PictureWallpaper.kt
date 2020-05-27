@@ -1,6 +1,7 @@
 package com.example.caisw.wallpaperbykotlin.core.spirit.wallpaper
 
 import android.graphics.*
+import android.util.Log
 import android.view.MotionEvent
 import android.view.ViewConfiguration
 import android.view.animation.DecelerateInterpolator
@@ -23,7 +24,13 @@ class PictureWallpaper : SpiritGroup() {
     private val scaledTouchSlop: Float
     private val animateHelper: AnimateHelper = AnimateHelper()
 
+    private val textPaint: Paint
+
     init {
+        textPaint = Paint()
+        textPaint.color = Color.WHITE
+        textPaint.isAntiAlias = true
+        textPaint.textSize = 25F
         visibleRectF = RectF(0f, 0f, ScreenInfo.WIDTH.toFloat(), ScreenInfo.HEIGHT.toFloat())
         //直接载入图片
         bitmap = BitmapFactory.decodeResource(MyApplication.instance.resources, R.raw.hate)
@@ -62,12 +69,19 @@ class PictureWallpaper : SpiritGroup() {
     }
 
     override fun draw(canvas: Canvas) {
-        canvas.save()
         super.draw(canvas)
+        canvas.save()
         animateHelper.updateCurrOffset()
         canvas.translate(offsetX, offsetY)
         canvas.drawBitmap(bitmap, bitmapMatrix, null)
         canvas.restore()
+//        canvas.drawText(getInfo(), 50f, 150f, textPaint)
+    }
+
+    private fun getInfo(): String {
+        val floatArr = FloatArray(9)
+        bitmapMatrix.getValues(floatArr);
+        return "offsetX = $offsetX,offsetY = $offsetY,scaleX = ${floatArr[Matrix.MSCALE_X]},scaleY = ${floatArr[Matrix.MSCALE_Y]}"
     }
 
     override fun drawBounds(canvas: Canvas) {
@@ -123,6 +137,7 @@ class PictureWallpaper : SpiritGroup() {
 
     fun setVisibleRectF(l: Float, t: Float, r: Float, b: Float) {
         visibleRectF.set(l, t, r, b)
+        Log.i(javaClass.simpleName, visibleRectF.toString());
         bitmapMatrix.reset()
         //进行矩阵变换，使图片呈现居中裁减状态
         MatrixUtils.setRectToRect(
@@ -167,6 +182,7 @@ class PictureWallpaper : SpiritGroup() {
             startTime = System.currentTimeMillis()
             //平滑动画，一屏幕的距离3000毫秒
             duration = (Math.sqrt(Math.pow(endX - startX + 0.0, 2.0) + Math.pow(endY - startY + 0.0, 2.0)) / ScreenInfo.WIDTH * 3000).toLong()
+            duration = Math.min(duration, 3000)//动画时间不要超出3秒
             if (duration == 0L) {
                 offsetX = endX
                 offsetY = endY
